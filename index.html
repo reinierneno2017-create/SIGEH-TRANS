@@ -1,36 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Ultra Simple</title>
+    <title>SIGEH-TRANS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .error { color: red; margin-top: 10px; }
+        .exito { color: green; margin-top: 10px; }
+        .footer { margin-top: 20px; font-size: 11px; color: #999; }
+    </style>
 </head>
-<body style="font-family: Arial; text-align: center; padding: 50px;">
-    <h1>🚛 SIGEH-TRANS</h1>
-    <p>Test más simple posible</p>
-    
-    <input type="text" id="email" placeholder="Email" style="padding: 10px; width: 250px;"><br><br>
-    <input type="password" id="pass" placeholder="Contraseña" style="padding: 10px; width: 250px;"><br><br>
-    
-    <button id="miBoton" style="padding: 12px 30px; background: blue; color: white; border: none; border-radius: 5px;">CLIC AQUÍ</button>
-    
-    <p id="resultado" style="margin-top: 30px; font-size: 18px;"></p>
+<body>
+    <div class="login-box">
+        <h1>🚛 SIGEH-TRANS</h1>
+        <p>Sistema de Gestión Humana del Transporte</p>
+        
+        <input type="email" id="email" placeholder="Correo electrónico" value="reinierneno2017@gmail.com">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="iniciarSesion()">INICIAR SESIÓN</button>
+        
+        <div id="resultado"></div>
+        <div class="footer">Desarrollado por Reynier Velázquez Morales - 2026</div>
+    </div>
 
     <script>
-        // Buscar el botón por ID
-        const boton = document.getElementById('miBoton');
-        const resultado = document.getElementById('resultado');
+        const SUPABASE_URL = "https://xumprhxuuvxmgrjpafbk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1bXByaHh1dXZ4bWdyanBhZmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODQxMzksImV4cCI6MjA5MTE2MDEzOX0.yp8WFWGjkRdA-mK9wXMVsiBec18SoZMTcOvqxXH5qw8";
         
-        // Agregar evento al botón
-        boton.addEventListener('click', function() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        async function iniciarSesion() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const resultado = document.getElementById('resultado');
             
-            resultado.innerHTML = '✅ Botón funcionó. Email: ' + email + ' - Pass: ' + (pass ? '****' : 'vacía');
-            resultado.style.color = 'green';
-        });
-        
-        // Mensaje de carga
-        resultado.innerHTML = '✅ Página cargada. Haz clic en el botón.';
-        resultado.style.color = 'blue';
+            resultado.innerHTML = '⏳ Conectando...';
+            resultado.style.color = 'blue';
+            
+            if (!email || !password) {
+                resultado.innerHTML = '❌ Complete todos los campos';
+                resultado.style.color = 'red';
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    resultado.innerHTML = '❌ ' + error.message;
+                    resultado.style.color = 'red';
+                } else {
+                    resultado.innerHTML = '✅ ¡BIENVENIDO! ' + data.user.email;
+                    resultado.style.color = 'green';
+                    
+                    // Opcional: redirigir al dashboard después de 2 segundos
+                    setTimeout(() => {
+                        alert('Login exitoso como: ' + data.user.email);
+                    }, 500);
+                }
+            } catch (err) {
+                resultado.innerHTML = '❌ Error: ' + err.message;
+                resultado.style.color = 'red';
+            }
+        }
     </script>
 </body>
 </html>
