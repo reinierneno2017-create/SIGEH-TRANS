@@ -2,333 +2,58 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>SIGEH-TRANS - Sistema de Gestión Humana del Transporte</title>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        /* Login Container */
-        .login-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            width: 420px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        .login-card h1 {
-            color: #667eea;
-            margin-bottom: 5px;
-            font-size: 28px;
-        }
-
-        .login-card .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 12px;
-            letter-spacing: 1px;
-        }
-
-        .login-card input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .login-card input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .login-card button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .login-card button:hover {
-            opacity: 0.9;
-        }
-
-        .error-msg {
-            color: #e74c3c;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        /* Footer del login */
-        .login-footer {
-            text-align: center;
-            padding: 20px;
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
-            margin-top: 20px;
-        }
-
-        /* Main App Container */
-        .app-container {
-            display: none;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Navbar */
-        .navbar {
-            background: #2c3e50;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .navbar .logo {
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .navbar .logo span {
-            color: #667eea;
-        }
-
-        .navbar .logo small {
-            font-size: 10px;
-            font-weight: normal;
-            display: block;
-            color: #aaa;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .nav-links a:hover {
-            background: #34495e;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logout-btn {
-            background: #e74c3c;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .logout-btn:hover {
-            background: #c0392b;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            flex: 1;
-        }
-
-        /* Dashboard Cards */
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .card h3 {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .card .number {
-            font-size: 36px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        /* Search Section */
-        .search-section {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .search-section h2, .search-section h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .search-box input {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .search-box button {
-            padding: 15px 30px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .search-box button:hover {
-            background: #5a67d8;
-        }
-
-        .filters {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-
-        .filters input, .filters select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        /* Worker Card */
-        .worker-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .worker-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-        .worker-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .worker-ci {
-            color: #666;
-            font-size: 18px;
-        }
-
-        .worker-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .info-section {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .info-section h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .info-label {
-            font-weight: bold;
-            color: #555;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .login-container { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .login-card { background: white; border-radius: 20px; padding: 40px; width: 420px; max-width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
+        .login-card h1 { color: #667eea; margin-bottom: 5px; font-size: 28px; }
+        .login-card .subtitle { color: #666; margin-bottom: 30px; font-size: 12px; letter-spacing: 1px; }
+        .login-card input { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
+        .login-card input:focus { outline: none; border-color: #667eea; }
+        .login-card button { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .login-card button:hover { opacity: 0.9; }
+        .error-msg { color: #e74c3c; margin-top: 15px; font-size: 14px; }
+        .login-footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 20px; }
+        .app-container { display: none; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { background: #2c3e50; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .navbar .logo { font-size: 22px; font-weight: bold; }
+        .navbar .logo span { color: #667eea; }
+        .navbar .logo small { font-size: 10px; font-weight: normal; display: block; color: #aaa; }
+        .nav-links { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .nav-links a { color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .nav-links a:hover { background: #34495e; }
+        .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .logout-btn { background: #e74c3c; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+        .logout-btn:hover { background: #c0392b; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; flex: 1; }
+        .dashboard-cards { display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; justify-content: flex-start; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; flex: 1; min-width: 180px; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); }
+        .card h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
+        .card .number { font-size: 32px; font-weight: bold; color: #667eea; }
+        @media (max-width: 768px) { .dashboard-cards { flex-direction: column; } .card { min-width: 100%; } .nav-links { justify-content: center; } .navbar { flex-direction: column; text-align: center; } .filters { flex-direction: column; } .search-box { flex-direction: column; } }
+        .search-section { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .search-section h2, .search-section h3 { color: #667eea; margin-bottom: 20px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-box input { flex: 1; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
+        .search-box button { padding: 15px 30px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; }
+        .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
+        .filters input, .filters select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; flex: 1; min-width: 150px; }
+        .worker-card { background: #f8f9fa; border-radius: 15px; padding: 25px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
+        .worker-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 2px solid #667eea; padding-bottom: 15px; margin-bottom: 15px; }
+        .worker-name { font-size: 24px; font-weight: bold; color: #667eea; }
+        .worker-ci { color: #666; font-size: 18px; }
+        .worker-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .info-section { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .info-section h4 { color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .info-label { font-weight: bold; color: #555; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .badge-pcc { background: #e74c3c; color: white; }
         .badge-ujc { background: #3498db; color: white; }
         .badge-none { background: #95a5a6; color: white; }
@@ -336,206 +61,34 @@
         .badge-superadmin { background: #9b59b6; color: white; }
         .badge-admin { background: #e67e22; color: white; }
         .badge-consultor { background: #3498db; color: white; }
-
-        .action-buttons {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .btn-edit {
-            background: #f39c12;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .btn-add {
-            background: #667eea;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .btn-add:hover {
-            background: #5a67d8;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-content h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-family: inherit;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .btn-save {
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            background: #95a5a6;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* Tables */
-        .data-table {
-            width: 100%;
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .data-table th, .data-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        .data-table th {
-            background: #667eea;
-            color: white;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-            cursor: pointer;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #2c3e50;
-            color: #aaa;
-            font-size: 12px;
-            margin-top: 40px;
-        }
-
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .audit-actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
+        .action-buttons { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+        .btn-edit { background: #f39c12; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-delete { background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-add { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-add:hover { background: #5a67d8; }
+        .btn-danger { background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-warning { background: #f39c12; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+        .modal-content h2 { color: #667eea; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-save { background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-cancel { background: #95a5a6; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
+        .data-table { width: 100%; background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .data-table table { width: 100%; min-width: 600px; }
+        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .data-table th { background: #667eea; color: white; }
+        .data-table tr:hover { background: #f8f9fa; cursor: pointer; }
+        .stats-grid { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+        .stat-card { background: white; border-radius: 10px; padding: 15px; text-align: center; flex: 1; min-width: 150px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .footer { text-align: center; padding: 20px; background: #2c3e50; color: #aaa; font-size: 12px; margin-top: 40px; }
+        .footer a { color: #667eea; text-decoration: none; }
+        .audit-actions { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+        .audit-actions select { padding: 8px; border-radius: 8px; border: 1px solid #ddd; flex: 1; min-width: 150px; }
+        .loading { text-align: center; padding: 40px; color: white; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -545,13 +98,22 @@
     <div class="login-card">
         <h1>🚛 SIGEH-TRANS</h1>
         <div class="subtitle">SISTEMA DE GESTIÓN HUMANA DEL TRANSPORTE</div>
-        <input type="text" id="loginUser" placeholder="Usuario" autocomplete="off">
+        <input type="email" id="loginUser" placeholder="Correo electrónico" autocomplete="off">
         <input type="password" id="loginPass" placeholder="Contraseña">
         <button onclick="doLogin()">Iniciar Sesión</button>
         <div id="loginError" class="error-msg"></div>
     </div>
     <div class="login-footer">
         Desarrollado por Reynier Velázquez Morales - 2026 - Todos los derechos reservados
+    </div>
+</div>
+
+<!-- Loading -->
+<div id="loadingScreen" class="login-container" style="display:none;">
+    <div class="login-card">
+        <h1>🚛 SIGEH-TRANS</h1>
+        <div class="subtitle">Cargando datos...</div>
+        <div class="loading">⏳ Conectando con la base de datos...</div>
     </div>
 </div>
 
@@ -565,11 +127,11 @@
         <div class="nav-links">
             <a onclick="showSection('dashboard')">📊 Dashboard</a>
             <a onclick="showSection('search')">🔍 Buscar</a>
-            <a onclick="showSection('workersList')">📋 Lista de Trabajadores</a>
+            <a onclick="showSection('workersList')">📋 Lista</a>
             <a onclick="showSection('reports')">📈 Reportes</a>
-            <a id="adminOnlyLink" style="display:none;" onclick="showSection('register')">➕ Registrar Trabajador</a>
-            <a id="userManagementLink" style="display:none;" onclick="showSection('userManagement')">👥 Gestionar Usuarios</a>
-            <a id="entidadesLink" style="display:none;" onclick="showSection('entidades')">🏢 Gestionar Entidades</a>
+            <a id="adminOnlyLink" style="display:none;" onclick="showSection('register')">➕ Registrar</a>
+            <a id="userManagementLink" style="display:none;" onclick="showSection('userManagement')">👥 Usuarios</a>
+            <a id="entidadesLink" style="display:none;" onclick="showSection('entidades')">🏢 Entidades</a>
             <a id="auditoriaLink" style="display:none;" onclick="showSection('auditoria')">📜 Auditoría</a>
             <div class="user-info">
                 <span id="currentUser">Usuario</span>
@@ -579,7 +141,6 @@
     </div>
 
     <div class="container">
-        <!-- Dashboard Section -->
         <div id="dashboardSection">
             <div class="dashboard-cards" id="dashboardCards"></div>
             <div class="search-section">
@@ -588,7 +149,6 @@
             </div>
         </div>
 
-        <!-- Search Section -->
         <div id="searchSection" style="display:none;">
             <div class="search-section">
                 <h2>🔍 Búsqueda Rápida por Carnet de Identidad</h2>
@@ -601,12 +161,12 @@
             <div class="search-section">
                 <h3>🔎 Búsqueda Avanzada</h3>
                 <div class="filters">
-                    <input type="text" id="filterNombre" placeholder="Nombre" onkeyup="filtrarTrabajadores()">
-                    <input type="text" id="filterCI" placeholder="Carnet de Identidad" onkeyup="filtrarTrabajadores()">
-                    <select id="filterEntidad" onchange="filtrarTrabajadores()">
+                    <input type="text" id="filterNombre" placeholder="Buscar por nombre" onkeyup="buscarAvanzada()">
+                    <input type="text" id="filterCI" placeholder="Buscar por CI" onkeyup="buscarAvanzada()">
+                    <select id="filterEntidad" onchange="buscarAvanzada()">
                         <option value="">Todas las entidades</option>
                     </select>
-                    <select id="filterMilitancia" onchange="filtrarTrabajadores()">
+                    <select id="filterMilitancia" onchange="buscarAvanzada()">
                         <option value="">Toda militancia</option>
                         <option value="pcc">PCC</option>
                         <option value="ujc">UJC</option>
@@ -617,37 +177,32 @@
             </div>
         </div>
 
-        <!-- Workers List Section -->
         <div id="workersListSection" style="display:none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                 <h2 style="color: white;">📋 Lista de Trabajadores</h2>
                 <button id="addWorkerBtn" class="btn-add" style="display:none;" onclick="abrirModalRegistro()">+ Nuevo Trabajador</button>
             </div>
             <div class="data-table">
                 <table style="width:100%">
-                    <thead>
-                        <tr><th>CI</th><th>Nombre</th><th>Teléfono</th><th>Entidad</th><th>Cargo</th><th>Edad</th><th>Militancia</th></tr>
-                    </thead>
+                    <thead><tr><th>CI</th><th>Nombre</th><th>Teléfono</th><th>Entidad</th><th>Cargo</th><th>Edad</th><th>Militancia</th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Reports Section -->
         <div id="reportsSection" style="display:none;">
             <h2 style="color: white;">📈 Reportes Estadísticos</h2>
             <div class="dashboard-cards" id="reportCards"></div>
             <div class="search-section">
                 <h3>📋 Porcentaje por Escolaridad</h3>
-                <div id="escolaridadStats"></div>
+                <div id="escolaridadStats" class="stats-grid"></div>
             </div>
             <div class="search-section">
                 <h3>📋 Porcentaje por Militancia</h3>
-                <div id="militanciaStats"></div>
+                <div id="militanciaStats" class="stats-grid"></div>
             </div>
         </div>
 
-        <!-- Register Worker Section -->
         <div id="registerSection" style="display:none;">
             <div class="search-section">
                 <h2>➕ Registrar Nuevo Trabajador</h2>
@@ -655,38 +210,14 @@
                     <div class="form-group"><label>CI *</label><input type="text" id="reg_ci" required placeholder="Ej: 88010112345"></div>
                     <div class="form-group"><label>Nombre Completo *</label><input type="text" id="reg_nombre" required></div>
                     <div class="form-group"><label>Fecha Nacimiento *</label><input type="date" id="reg_fecha_nacimiento" required></div>
-                    <div class="form-group"><label>Sexo</label>
-                        <select id="reg_sexo">
-                            <option value="M">Masculino</option>
-                            <option value="F">Femenino</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Número Telefónico *</label><input type="tel" id="reg_telefono" required placeholder="Ej: 24-1234567 o 55123456"></div>
+                    <div class="form-group"><label>Sexo</label><select id="reg_sexo"><option value="M">Masculino</option><option value="F">Femenino</option></select></div>
+                    <div class="form-group"><label>Número Telefónico *</label><input type="tel" id="reg_telefono" required placeholder="Ej: 24-1234567"></div>
                     <div class="form-group"><label>Dirección</label><textarea id="reg_direccion" rows="2"></textarea></div>
                     <div class="form-group"><label>Municipio</label><input type="text" id="reg_municipio" placeholder="Holguín, Moa, etc."></div>
-                    <div class="form-group"><label>Entidad *</label>
-                        <select id="reg_entidad" required>
-                            <option value="">Seleccione una entidad</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label>Entidad *</label><select id="reg_entidad" required><option value="">Seleccione una entidad</option></select></div>
                     <div class="form-group"><label>Cargo *</label><input type="text" id="reg_cargo" required></div>
-                    <div class="form-group"><label>Nivel Escolar</label>
-                        <select id="reg_nivel_escolar">
-                            <option value="primaria">Primaria</option>
-                            <option value="secundaria">Secundaria</option>
-                            <option value="preuniversitario">Preuniversitario</option>
-                            <option value="tecnico_medio">Técnico Medio</option>
-                            <option value="universitario">Universitario</option>
-                            <option value="postgrado">Postgrado</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Militancia</label>
-                        <select id="reg_militancia">
-                            <option value="ninguna">No militante</option>
-                            <option value="ujc">UJC</option>
-                            <option value="pcc">PCC</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label>Nivel Escolar</label><select id="reg_nivel_escolar"><option value="primaria">Primaria</option><option value="secundaria">Secundaria</option><option value="preuniversitario">Preuniversitario</option><option value="tecnico_medio">Técnico Medio</option><option value="universitario">Universitario</option><option value="postgrado">Postgrado</option></select></div>
+                    <div class="form-group"><label>Militancia</label><select id="reg_militancia"><option value="ninguna">No militante</option><option value="ujc">UJC</option><option value="pcc">PCC</option></select></div>
                     <div class="form-group"><label>Licencia Tipo</label><input type="text" id="reg_licencia" placeholder="D, E, etc."></div>
                     <div class="form-group"><label>Vehículo Asignado</label><input type="text" id="reg_vehiculo"></div>
                     <button type="submit" class="btn-add" style="width:100%">Registrar Trabajador</button>
@@ -694,67 +225,54 @@
             </div>
         </div>
 
-        <!-- User Management Section (Super Admin only) -->
         <div id="userManagementSection" style="display:none;">
             <div class="search-section">
                 <h2>👥 Gestión de Usuarios del Sistema</h2>
                 <button class="btn-add" onclick="abrirModalCrearUsuario()" style="margin-bottom:20px">+ Crear Nuevo Usuario</button>
                 <div class="data-table">
-                    <table style="width:100%">
-                        <thead>
-                            <tr><th>Usuario</th><th>Rol</th><th>Entidad Asignada</th><th>Fecha Creación</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody id="usuariosTableBody"></tbody>
-                    </table>
+                    <table style="width:100%"><thead><tr><th>Usuario</th><th>Rol</th><th>Entidad Asignada</th><th>Fecha Creación</th><th>Acciones</th></tr></thead>
+                    <tbody id="usuariosTableBody"></tbody></table>
                 </div>
             </div>
         </div>
 
-        <!-- Entidades Management Section (Super Admin only) -->
         <div id="entidadesSection" style="display:none;">
             <div class="search-section">
                 <h2>🏢 Gestión de Entidades</h2>
                 <button class="btn-add" onclick="abrirModalCrearEntidad()" style="margin-bottom:20px">+ Nueva Entidad</button>
                 <div class="data-table">
-                    <table style="width:100%">
-                        <thead>
-                            <tr><th>Nombre de la Entidad</th><th>Fecha Creación</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody id="entidadesTableBody"></tbody>
-                    </table>
+                    <table style="width:100%"><thead><tr><th>Nombre de la Entidad</th><th>Fecha Creación</th><th>Acciones</th></tr></thead>
+                    <tbody id="entidadesTableBody"></tbody></table>
                 </div>
             </div>
         </div>
 
-        <!-- Auditoria Section (Super Admin only) -->
         <div id="auditoriaSection" style="display:none;">
             <div class="search-section">
                 <h2>📜 Registro de Auditoría</h2>
                 <div class="audit-actions">
-                    <select id="auditFilterUsuario" onchange="filtrarAuditoria()">
-                        <option value="">Todos los usuarios</option>
-                    </select>
-                    <select id="auditFilterAccion" onchange="filtrarAuditoria()">
+                    <select id="auditFilterUsuario" onchange="cargarAuditoria()"><option value="">Todos los usuarios</option></select>
+                    <select id="auditFilterAccion" onchange="cargarAuditoria()">
                         <option value="">Todas las acciones</option>
-                        <option value="busqueda">🔍 Búsquedas por CI</option>
-                        <option value="crear">➕ Creación de trabajadores</option>
-                        <option value="editar">✏️ Edición de trabajadores</option>
-                        <option value="eliminar">🗑️ Eliminación de trabajadores</option>
-                        <option value="login">🔐 Inicios de sesión</option>
-                        <option value="logout">🚪 Cierres de sesión</option>
-                        <option value="usuario">👥 Gestión de usuarios</option>
-                        <option value="entidad">🏢 Gestión de entidades</option>
+                        <option value="busqueda_ci">🔍 Búsqueda por CI</option>
+                        <option value="busqueda_nombre">🔎 Búsqueda por Nombre</option>
+                        <option value="busqueda_militancia">📊 Búsqueda por Militancia</option>
+                        <option value="busqueda_entidad">🏢 Búsqueda por Entidad</option>
+                        <option value="busqueda_avanzada">🔬 Búsqueda Avanzada</option>
+                        <option value="crear">➕ Creación</option>
+                        <option value="editar">✏️ Edición</option>
+                        <option value="eliminar">🗑️ Eliminación</option>
+                        <option value="login">🔐 Inicio Sesión</option>
+                        <option value="logout">🚪 Cierre Sesión</option>
+                        <option value="usuario">👥 Gestión Usuarios</option>
+                        <option value="entidad">🏢 Gestión Entidades</option>
                     </select>
                     <button class="btn-warning" onclick="limpiarFiltrosAuditoria()">Limpiar filtros</button>
-                    <button class="btn-danger" onclick="eliminarTodasAuditoria()">🗑️ Eliminar todo el historial</button>
+                    <button class="btn-danger" onclick="eliminarTodasAuditoria()">🗑️ Eliminar todo</button>
                 </div>
                 <div class="data-table">
-                    <table style="width:100%">
-                        <thead>
-                            <tr><th>Fecha y Hora</th><th>Usuario</th><th>Rol</th><th>Acción</th><th>Detalles</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody id="auditoriaTableBody"></tbody>
-                    </table>
+                    <table style="width:100%"><thead><tr><th>Fecha/Hora</th><th>Usuario</th><th>Rol</th><th>Acción</th><th>Detalles</th><th>Acciones</th></tr></thead>
+                    <tbody id="auditoriaTableBody"></tbody></table>
                 </div>
             </div>
         </div>
@@ -765,7 +283,7 @@
     </div>
 </div>
 
-<!-- Modal Editar Trabajador -->
+<!-- Modales -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h2>✏️ Editar Trabajador</h2>
@@ -774,38 +292,14 @@
             <div class="form-group"><label>CI</label><input type="text" id="edit_ci" readonly style="background:#f0f0f0"></div>
             <div class="form-group"><label>Nombre</label><input type="text" id="edit_nombre" required></div>
             <div class="form-group"><label>Fecha Nacimiento</label><input type="date" id="edit_fecha_nacimiento" required></div>
-            <div class="form-group"><label>Sexo</label>
-                <select id="edit_sexo">
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Número Telefónico</label><input type="tel" id="edit_telefono" required></div>
+            <div class="form-group"><label>Sexo</label><select id="edit_sexo"><option value="M">Masculino</option><option value="F">Femenino</option></select></div>
+            <div class="form-group"><label>Teléfono</label><input type="tel" id="edit_telefono" required></div>
             <div class="form-group"><label>Dirección</label><textarea id="edit_direccion" rows="2"></textarea></div>
             <div class="form-group"><label>Municipio</label><input type="text" id="edit_municipio"></div>
-            <div class="form-group"><label>Entidad</label>
-                <select id="edit_entidad" required>
-                    <option value="">Seleccione una entidad</option>
-                </select>
-            </div>
+            <div class="form-group"><label>Entidad</label><select id="edit_entidad" required><option value="">Seleccione una entidad</option></select></div>
             <div class="form-group"><label>Cargo</label><input type="text" id="edit_cargo" required></div>
-            <div class="form-group"><label>Nivel Escolar</label>
-                <select id="edit_nivel_escolar">
-                    <option value="primaria">Primaria</option>
-                    <option value="secundaria">Secundaria</option>
-                    <option value="preuniversitario">Preuniversitario</option>
-                    <option value="tecnico_medio">Técnico Medio</option>
-                    <option value="universitario">Universitario</option>
-                    <option value="postgrado">Postgrado</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Militancia</label>
-                <select id="edit_militancia">
-                    <option value="ninguna">No militante</option>
-                    <option value="ujc">UJC</option>
-                    <option value="pcc">PCC</option>
-                </select>
-            </div>
+            <div class="form-group"><label>Nivel Escolar</label><select id="edit_nivel_escolar"><option value="primaria">Primaria</option><option value="secundaria">Secundaria</option><option value="preuniversitario">Preuniversitario</option><option value="tecnico_medio">Técnico Medio</option><option value="universitario">Universitario</option><option value="postgrado">Postgrado</option></select></div>
+            <div class="form-group"><label>Militancia</label><select id="edit_militancia"><option value="ninguna">No militante</option><option value="ujc">UJC</option><option value="pcc">PCC</option></select></div>
             <div class="form-group"><label>Licencia Tipo</label><input type="text" id="edit_licencia"></div>
             <div class="form-group"><label>Vehículo Asignado</label><input type="text" id="edit_vehiculo"></div>
             <div class="modal-buttons">
@@ -816,12 +310,11 @@
     </div>
 </div>
 
-<!-- Modal Crear Usuario -->
 <div id="crearUsuarioModal" class="modal">
     <div class="modal-content">
         <h2>👤 Crear Nuevo Usuario</h2>
         <form id="crearUsuarioForm">
-            <div class="form-group"><label>Usuario *</label><input type="text" id="newUsername" required placeholder="ej: jperez"></div>
+            <div class="form-group"><label>Correo Electrónico *</label><input type="email" id="newUsername" required placeholder="usuario@ejemplo.cu"></div>
             <div class="form-group"><label>Contraseña *</label><input type="password" id="newPassword" required></div>
             <div class="form-group"><label>Rol *</label>
                 <select id="newUserRole" onchange="toggleEntidadField()">
@@ -832,10 +325,8 @@
             </div>
             <div class="form-group" id="entidadField" style="display:none;">
                 <label>Entidad Asignada *</label>
-                <select id="newUserEntidad" required>
-                    <option value="">Seleccione una entidad</option>
-                </select>
-                <small style="color:#666;">Este usuario solo podrá editar trabajadores de esta entidad</small>
+                <select id="newUserEntidad" required><option value="">Seleccione una entidad</option></select>
+                <small>Este usuario solo podrá editar trabajadores de esta entidad</small>
             </div>
             <div class="modal-buttons">
                 <button type="button" class="btn-cancel" onclick="cerrarModalUsuario()">Cancelar</button>
@@ -845,7 +336,6 @@
     </div>
 </div>
 
-<!-- Modal Crear Entidad -->
 <div id="crearEntidadModal" class="modal">
     <div class="modal-content">
         <h2>🏢 Nueva Entidad</h2>
@@ -860,38 +350,21 @@
 </div>
 
 <script>
-    // ==================== DATOS INICIALES ====================
+    // ==================== CONFIGURACIÓN DE SUPABASE ====================
+    const SUPABASE_URL = "https://jnmhbsvjnsvagcdfujok.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubWhic3ZqbnN2YWdjZGZ1am9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzQ5NjUsImV4cCI6MjA5MTE1MDk2NX0.n6cSbVkX0u23zshq49O0FPCwLKS3MP-o8J8EyroI75E";
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Variables globales
     let trabajadores = [];
-    let usuarios = [];
     let entidades = [];
+    let usuarios = [];
     let auditoria = [];
     let currentUser = null;
-    
-    // Lista de entidades iniciales
-    const entidadesIniciales = [
-        "Empresa de Ómnibus Holguín",
-        "Empresa de Taxis Holguín",
-        "Talleres Centrales",
-        "Cooperativa de Taxis Banes",
-        "Empresa de Ómnibus Moa",
-        "Dirección Provincial de Transporte"
-    ];
-    
-    // Datos de trabajadores de ejemplo
-    const datosInicialesTrabajadores = [
-        { id: "1", ci: "88010112345", nombre: "Juan Carlos Pérez Rodríguez", fecha_nacimiento: "1988-01-01", sexo: "M", telefono: "24-1234567", direccion: "Calle Libertad #123, Holguín", municipio: "Holguín", entidad: "Empresa de Ómnibus Holguín", cargo: "Chofer Categoría I", nivel_escolar: "tecnico_medio", militancia: "pcc", licencia: "D", vehiculo: "Yutong H12345" },
-        { id: "2", ci: "90051567890", nombre: "María del Carmen López", fecha_nacimiento: "1990-05-15", sexo: "F", telefono: "24-7654321", direccion: "Calle Maceo #45, Moa", municipio: "Moa", entidad: "Empresa de Taxis Holguín", cargo: "Administradora", nivel_escolar: "universitario", militancia: "ujc", licencia: "", vehiculo: "" },
-        { id: "3", ci: "75032054321", nombre: "Pedro Martínez Reyes", fecha_nacimiento: "1975-03-20", sexo: "M", telefono: "24-9876543", direccion: "Reparto Vista Alegre #8, Holguín", municipio: "Holguín", entidad: "Talleres Centrales", cargo: "Mecánico Jefe", nivel_escolar: "tecnico_medio", militancia: "pcc", licencia: "", vehiculo: "" },
-        { id: "4", ci: "20011298765", nombre: "Ana Beatriz Fernández", fecha_nacimiento: "2001-12-10", sexo: "F", telefono: "24-5555555", direccion: "Calle Martí #67, Gibara", municipio: "Gibara", entidad: "Empresa de Ómnibus Holguín", cargo: "Chofer", nivel_escolar: "preuniversitario", militancia: "ujc", licencia: "D", vehiculo: "Yutong G67890" },
-        { id: "5", ci: "95080845678", nombre: "Carlos Enrique Díaz", fecha_nacimiento: "1995-08-08", sexo: "M", telefono: "24-4444444", direccion: "Banes, Calle Principal", municipio: "Banes", entidad: "Cooperativa de Taxis Banes", cargo: "Taxista", nivel_escolar: "secundaria", militancia: "ninguna", licencia: "B", vehiculo: "Lada 2107" }
-    ];
-    
-    // Datos de usuarios de ejemplo
-    const datosInicialesUsuarios = [
-        { id: "1", username: "reynier", password: "admin123", rol: "superadmin", entidad_asignada: null, fecha_creacion: new Date().toISOString() },
-        { id: "2", username: "jperez", password: "chofer123", rol: "admin_entidad", entidad_asignada: "Empresa de Ómnibus Holguín", fecha_creacion: new Date().toISOString() },
-        { id: "3", username: "mlopez", password: "lectura123", rol: "consultor", entidad_asignada: null, fecha_creacion: new Date().toISOString() }
-    ];
+    let currentUserRol = null;
+    let currentUserEntidad = null;
+    let currentUserEmail = null;
     
     // ==================== FUNCIONES AUXILIARES ====================
     function calcularEdad(fechaNacimiento) {
@@ -918,142 +391,124 @@
         return labels[rol] || rol;
     }
     
-    // Registrar acción en auditoría
-    function registrarAuditoria(accion, detalles) {
+    async function registrarAuditoria(accion, detalles) {
         if (!currentUser) return;
-        const registro = {
-            id: Date.now(),
-            fecha: new Date().toISOString(),
-            usuario: currentUser.username,
-            rol: currentUser.rol,
-            accion: accion,
-            detalles: detalles,
-            entidad_asignada: currentUser.entidad_asignada || null
-        };
-        auditoria.unshift(registro); // Los nuevos al principio
-        guardarDatos();
-    }
-    
-    // Guardar en localStorage
-    function guardarDatos() {
-        localStorage.setItem('sigehtrans_trabajadores', JSON.stringify(trabajadores));
-        localStorage.setItem('sigehtrans_usuarios', JSON.stringify(usuarios));
-        localStorage.setItem('sigehtrans_entidades', JSON.stringify(entidades));
-        localStorage.setItem('sigehtrans_auditoria', JSON.stringify(auditoria));
-    }
-    
-    function cargarDatos() {
-        const storedTrabajadores = localStorage.getItem('sigehtrans_trabajadores');
-        const storedUsuarios = localStorage.getItem('sigehtrans_usuarios');
-        const storedEntidades = localStorage.getItem('sigehtrans_entidades');
-        const storedAuditoria = localStorage.getItem('sigehtrans_auditoria');
-        
-        if (storedTrabajadores) {
-            trabajadores = JSON.parse(storedTrabajadores);
-        } else {
-            trabajadores = datosInicialesTrabajadores;
-        }
-        
-        if (storedUsuarios) {
-            usuarios = JSON.parse(storedUsuarios);
-        } else {
-            usuarios = datosInicialesUsuarios;
-        }
-        
-        if (storedEntidades) {
-            entidades = JSON.parse(storedEntidades);
-        } else {
-            entidades = [...entidadesIniciales];
-        }
-        
-        if (storedAuditoria) {
-            auditoria = JSON.parse(storedAuditoria);
-        } else {
-            auditoria = [];
+        try {
+            await supabase.from('auditoria').insert([{
+                usuario: currentUserEmail,
+                rol: currentUserRol,
+                accion: accion,
+                detalles: detalles,
+                entidad_asignada: currentUserEntidad,
+                fecha: new Date().toISOString()
+            }]);
+        } catch (error) {
+            console.error('Error al registrar auditoría:', error);
         }
     }
     
-    // Verificar si el usuario puede editar un trabajador
     function puedeEditarTrabajador(trabajador) {
-        if (currentUser.rol === 'superadmin') return true;
-        if (currentUser.rol === 'admin_entidad' && currentUser.entidad_asignada === trabajador.entidad) return true;
+        if (currentUserRol === 'superadmin') return true;
+        if (currentUserRol === 'admin_entidad' && currentUserEntidad === trabajador.entidad) return true;
         return false;
     }
     
-    // Obtener trabajadores visibles para el usuario actual
     function getTrabajadoresVisibles() {
-        if (currentUser.rol === 'superadmin') return trabajadores;
-        if (currentUser.rol === 'admin_entidad') {
-            return trabajadores.filter(t => t.entidad === currentUser.entidad_asignada);
+        if (currentUserRol === 'superadmin') return trabajadores;
+        if (currentUserRol === 'admin_entidad') {
+            return trabajadores.filter(t => t.entidad === currentUserEntidad);
         }
         return trabajadores;
     }
     
     // ==================== LOGIN ====================
-    function doLogin() {
-        const username = document.getElementById('loginUser').value.trim();
+    async function doLogin() {
+        const email = document.getElementById('loginUser').value.trim();
         const password = document.getElementById('loginPass').value;
         
-        if (!username || !password) {
-            document.getElementById('loginError').innerText = 'Ingrese usuario y contraseña';
+        if (!email || !password) {
+            document.getElementById('loginError').innerText = 'Ingrese correo y contraseña';
             return;
         }
         
-        const user = usuarios.find(u => u.username === username && u.password === password);
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('loadingScreen').style.display = 'flex';
         
-        if (!user) {
-            document.getElementById('loginError').innerText = 'Usuario o contraseña incorrectos';
-            return;
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            currentUser = data.user;
+            currentUserEmail = data.user.email;
+            
+            const { data: userData, error: userError } = await supabase
+                .from('usuarios')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+            
+            if (userError && userError.code !== 'PGRST116') {
+                console.error(userError);
+                currentUserRol = 'consultor';
+                currentUserEntidad = null;
+            } else if (userData) {
+                currentUserRol = userData.rol;
+                currentUserEntidad = userData.entidad_asignada;
+            } else {
+                currentUserRol = 'consultor';
+                currentUserEntidad = null;
+            }
+            
+            await registrarAuditoria('login', 'Inicio de sesión');
+            
+            await cargarTrabajadores();
+            await cargarEntidades();
+            await cargarUsuarios();
+            await cargarAuditoria();
+            
+            iniciarSesion();
+            
+        } catch (error) {
+            console.error(error);
+            document.getElementById('loginError').innerText = 'Error: ' + error.message;
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loadingScreen').style.display = 'none';
         }
-        
-        currentUser = { ...user };
-        registrarAuditoria('login', `Inicio de sesión`);
-        iniciarSesion();
     }
     
     function iniciarSesion() {
-        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('loadingScreen').style.display = 'none';
         document.getElementById('appContainer').style.display = 'flex';
         
         let rolTexto = '';
-        if (currentUser.rol === 'superadmin') rolTexto = 'Super Administrador';
-        else if (currentUser.rol === 'admin_entidad') rolTexto = `Administrador (${currentUser.entidad_asignada})`;
+        if (currentUserRol === 'superadmin') rolTexto = 'Super Administrador';
+        else if (currentUserRol === 'admin_entidad') rolTexto = `Administrador (${currentUserEntidad})`;
         else rolTexto = 'Consultor';
         
-        document.getElementById('currentUser').innerHTML = `${currentUser.username} (${rolTexto})`;
+        document.getElementById('currentUser').innerHTML = `${currentUserEmail} (${rolTexto})`;
         
-        // Mostrar botones según rol
-        if (currentUser.rol === 'superadmin') {
-            document.getElementById('adminOnlyLink').style.display = 'block';
-            document.getElementById('userManagementLink').style.display = 'block';
-            document.getElementById('entidadesLink').style.display = 'block';
-            document.getElementById('auditoriaLink').style.display = 'block';
-            document.getElementById('addWorkerBtn').style.display = 'inline-block';
-        } else if (currentUser.rol === 'admin_entidad') {
-            document.getElementById('adminOnlyLink').style.display = 'block';
-            document.getElementById('userManagementLink').style.display = 'none';
-            document.getElementById('entidadesLink').style.display = 'none';
-            document.getElementById('auditoriaLink').style.display = 'none';
-            document.getElementById('addWorkerBtn').style.display = 'inline-block';
-        } else {
-            document.getElementById('adminOnlyLink').style.display = 'none';
-            document.getElementById('userManagementLink').style.display = 'none';
-            document.getElementById('entidadesLink').style.display = 'none';
-            document.getElementById('auditoriaLink').style.display = 'none';
-            document.getElementById('addWorkerBtn').style.display = 'none';
-        }
+        const isSuperAdmin = currentUserRol === 'superadmin';
+        const isAdminEntidad = currentUserRol === 'admin_entidad';
+        
+        document.getElementById('adminOnlyLink').style.display = (isSuperAdmin || isAdminEntidad) ? 'block' : 'none';
+        document.getElementById('userManagementLink').style.display = isSuperAdmin ? 'block' : 'none';
+        document.getElementById('entidadesLink').style.display = isSuperAdmin ? 'block' : 'none';
+        document.getElementById('auditoriaLink').style.display = isSuperAdmin ? 'block' : 'none';
+        document.getElementById('addWorkerBtn').style.display = (isSuperAdmin || isAdminEntidad) ? 'inline-block' : 'none';
         
         cargarSelectsEntidades();
-        cargarFiltrosEntidad();
         actualizarDashboard();
         actualizarListaTrabajadores();
-        cargarUsuarios();
-        cargarEntidades();
         showSection('dashboard');
     }
     
-    function logout() {
-        registrarAuditoria('logout', `Cierre de sesión`);
+    async function logout() {
+        await registrarAuditoria('logout', 'Cierre de sesión');
+        await supabase.auth.signOut();
         currentUser = null;
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
@@ -1063,347 +518,97 @@
     }
     
     // ==================== CRUD TRABAJADORES ====================
-    function registrarTrabajador(nuevo) {
-        if (currentUser.rol !== 'superadmin' && currentUser.rol !== 'admin_entidad') {
-            alert('No tienes permisos para registrar trabajadores');
-            return false;
-        }
-        
-        if (trabajadores.find(t => t.ci === nuevo.ci)) {
-            alert('Ya existe un trabajador con ese CI');
-            return false;
-        }
-        
-        trabajadores.push(nuevo);
-        guardarDatos();
-        registrarAuditoria('crear', `Registró trabajador: ${nuevo.nombre} (CI: ${nuevo.ci}, Tel: ${nuevo.telefono})`);
+    async function cargarTrabajadores() {
+        const { data, error } = await supabase.from('trabajadores').select('*').order('nombre');
+        if (error) { console.error(error); return; }
+        trabajadores = data;
         actualizarDashboard();
         actualizarListaTrabajadores();
         cargarFiltrosEntidad();
-        alert('Trabajador registrado correctamente');
-        return true;
     }
     
-    function editarTrabajador(id, datos) {
-        const index = trabajadores.findIndex(t => t.id === id);
-        if (index !== -1) {
-            const nombreOriginal = trabajadores[index].nombre;
-            trabajadores[index] = { ...trabajadores[index], ...datos };
-            guardarDatos();
-            registrarAuditoria('editar', `Editó trabajador: ${nombreOriginal}`);
-            actualizarDashboard();
-            actualizarListaTrabajadores();
-            cargarFiltrosEntidad();
-            return true;
+    async function registrarTrabajador(nuevo) {
+        if (currentUserRol !== 'superadmin' && currentUserRol !== 'admin_entidad') {
+            alert('No tienes permisos para registrar trabajadores');
+            return false;
         }
-        return false;
+        try {
+            const { error } = await supabase.from('trabajadores').insert([nuevo]);
+            if (error) throw error;
+            await registrarAuditoria('crear', `Registró trabajador: ${nuevo.nombre} (CI: ${nuevo.ci})`);
+            await cargarTrabajadores();
+            alert('Trabajador registrado correctamente');
+            return true;
+        } catch (error) {
+            alert('Error: ' + error.message);
+            return false;
+        }
     }
     
-    function eliminarTrabajador(id, ci, nombre) {
+    async function editarTrabajador(id, datos) {
+        try {
+            const { error } = await supabase.from('trabajadores').update(datos).eq('id', id);
+            if (error) throw error;
+            await registrarAuditoria('editar', `Editó trabajador ID: ${id}`);
+            await cargarTrabajadores();
+            alert('Datos actualizados correctamente');
+            return true;
+        } catch (error) {
+            alert('Error: ' + error.message);
+            return false;
+        }
+    }
+    
+    async function eliminarTrabajador(id, ci, nombre) {
         if (confirm(`¿Eliminar trabajador ${nombre} con CI ${ci}?`)) {
-            trabajadores = trabajadores.filter(t => t.id !== id);
-            guardarDatos();
-            registrarAuditoria('eliminar', `Eliminó trabajador: ${nombre} (CI: ${ci})`);
-            actualizarDashboard();
-            actualizarListaTrabajadores();
-            cargarFiltrosEntidad();
-            alert('Trabajador eliminado');
-            return true;
-        }
-        return false;
-    }
-    
-    // ==================== GESTIÓN DE ENTIDADES ====================
-    function agregarEntidad(nombre) {
-        if (entidades.includes(nombre)) {
-            alert('La entidad ya existe');
-            return false;
-        }
-        entidades.push(nombre);
-        guardarDatos();
-        registrarAuditoria('entidad', `Agregó nueva entidad: ${nombre}`);
-        cargarSelectsEntidades();
-        cargarEntidades();
-        alert(`Entidad "${nombre}" agregada correctamente`);
-        return true;
-    }
-    
-    function eliminarEntidad(nombre) {
-        const trabajadoresEnEntidad = trabajadores.filter(t => t.entidad === nombre);
-        if (trabajadoresEnEntidad.length > 0) {
-            alert(`No se puede eliminar la entidad "${nombre}" porque tiene ${trabajadoresEnEntidad.length} trabajadores asociados.`);
-            return false;
-        }
-        
-        if (confirm(`¿Eliminar la entidad "${nombre}"?`)) {
-            entidades = entidades.filter(e => e !== nombre);
-            guardarDatos();
-            registrarAuditoria('entidad', `Eliminó entidad: ${nombre}`);
-            cargarSelectsEntidades();
-            cargarEntidades();
-            alert('Entidad eliminada');
-            return true;
-        }
-        return false;
-    }
-    
-    function cargarEntidades() {
-        if (currentUser.rol !== 'superadmin') return;
-        
-        const tbody = document.getElementById('entidadesTableBody');
-        tbody.innerHTML = '';
-        
-        entidades.forEach(entidad => {
-            const row = tbody.insertRow();
-            row.insertCell(0).innerHTML = entidad;
-            row.insertCell(1).innerHTML = new Date().toLocaleDateString();
-            row.insertCell(2).innerHTML = `<button class="btn-delete" style="padding:4px 12px" onclick="eliminarEntidad('${entidad}')">Eliminar</button>`;
-        });
-    }
-    
-    function cargarSelectsEntidades() {
-        const selects = ['reg_entidad', 'edit_entidad', 'newUserEntidad', 'filterEntidad'];
-        const opciones = '<option value="">Seleccione una entidad</option>' + entidades.map(e => `<option value="${e}">${e}</option>`).join('');
-        
-        selects.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (select) {
-                const valorActual = select.value;
-                select.innerHTML = opciones;
-                if (valorActual && entidades.includes(valorActual)) {
-                    select.value = valorActual;
-                }
+            try {
+                const { error } = await supabase.from('trabajadores').delete().eq('id', id);
+                if (error) throw error;
+                await registrarAuditoria('eliminar', `Eliminó trabajador: ${nombre} (CI: ${ci})`);
+                await cargarTrabajadores();
+                alert('Trabajador eliminado');
+                return true;
+            } catch (error) {
+                alert('Error: ' + error.message);
+                return false;
             }
-        });
-        
-        // Para el filtro de entidad en auditoría
-        const auditFilterUsuario = document.getElementById('auditFilterUsuario');
-        if (auditFilterUsuario) {
-            auditFilterUsuario.innerHTML = '<option value="">Todos los usuarios</option>' + 
-                [...new Set(usuarios.map(u => u.username))].map(u => `<option value="${u}">${u}</option>`).join('');
         }
+        return false;
     }
     
-    // ==================== GESTIÓN DE USUARIOS ====================
-    function crearUsuario(username, password, rol, entidadAsignada = null) {
-        if (currentUser.rol !== 'superadmin') {
-            alert('Solo el Super Administrador puede crear usuarios');
-            return false;
-        }
-        
-        if (usuarios.find(u => u.username === username)) {
-            alert('El nombre de usuario ya existe');
-            return false;
-        }
-        
-        const nuevoUsuario = {
-            id: Date.now().toString(),
-            username: username,
-            password: password,
-            rol: rol,
-            entidad_asignada: entidadAsignada,
-            fecha_creacion: new Date().toISOString()
-        };
-        
-        usuarios.push(nuevoUsuario);
-        guardarDatos();
-        registrarAuditoria('usuario', `Creó usuario: ${username} con rol ${rol}${entidadAsignada ? ` (Entidad: ${entidadAsignada})` : ''}`);
-        cargarUsuarios();
-        cargarSelectsEntidades(); // Para actualizar filtro de auditoría
-        alert(`Usuario ${username} creado correctamente`);
-        return true;
-    }
-    
-    function eliminarUsuario(id, username) {
-        if (currentUser.rol !== 'superadmin') {
-            alert('No tienes permisos para eliminar usuarios');
-            return;
-        }
-        
-        if (currentUser.id === id) {
-            alert('No puedes eliminar tu propio usuario');
-            return;
-        }
-        
-        if (confirm(`¿Eliminar usuario ${username}?`)) {
-            usuarios = usuarios.filter(u => u.id !== id);
-            guardarDatos();
-            registrarAuditoria('usuario', `Eliminó usuario: ${username}`);
-            cargarUsuarios();
-            cargarSelectsEntidades();
-            alert('Usuario eliminado');
-        }
-    }
-    
-    function cargarUsuarios() {
-        if (currentUser.rol !== 'superadmin') return;
-        
-        const tbody = document.getElementById('usuariosTableBody');
-        tbody.innerHTML = '';
-        
-        usuarios.forEach(user => {
-            const row = tbody.insertRow();
-            row.insertCell(0).innerHTML = user.username;
-            row.insertCell(1).innerHTML = `<span class="badge ${user.rol === 'superadmin' ? 'badge-superadmin' : (user.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(user.rol)}</span>`;
-            row.insertCell(2).innerHTML = user.entidad_asignada || 'Todas';
-            row.insertCell(3).innerHTML = new Date(user.fecha_creacion).toLocaleDateString();
-            row.insertCell(4).innerHTML = `<button class="btn-delete" style="padding:4px 12px" onclick="eliminarUsuario('${user.id}', '${user.username}')">Eliminar</button>`;
-        });
-    }
-    
-    function toggleEntidadField() {
-        const rol = document.getElementById('newUserRole').value;
-        const entidadField = document.getElementById('entidadField');
-        entidadField.style.display = rol === 'admin_entidad' ? 'block' : 'none';
-    }
-    
-    // ==================== AUDITORÍA ====================
-    function cargarAuditoria() {
-        if (currentUser.rol !== 'superadmin') return;
-        
-        const filtroUsuario = document.getElementById('auditFilterUsuario').value;
-        const filtroAccion = document.getElementById('auditFilterAccion').value;
-        
-        let auditoriaFiltrada = [...auditoria];
-        
-        if (filtroUsuario) {
-            auditoriaFiltrada = auditoriaFiltrada.filter(a => a.usuario === filtroUsuario);
-        }
-        
-        if (filtroAccion) {
-            auditoriaFiltrada = auditoriaFiltrada.filter(a => a.accion === filtroAccion);
-        }
-        
-        const tbody = document.getElementById('auditoriaTableBody');
-        tbody.innerHTML = '';
-        
-        if (auditoriaFiltrada.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No hay registros de auditoría</td></tr>';
-            return;
-        }
-        
-        auditoriaFiltrada.forEach(reg => {
-            const row = tbody.insertRow();
-            row.insertCell(0).innerHTML = new Date(reg.fecha).toLocaleString();
-            row.insertCell(1).innerHTML = reg.usuario;
-            row.insertCell(2).innerHTML = `<span class="badge ${reg.rol === 'superadmin' ? 'badge-superadmin' : (reg.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(reg.rol)}</span>`;
-            
-            let accionIcono = '';
-            if (reg.accion === 'busqueda') accionIcono = '🔍 ';
-            else if (reg.accion === 'crear') accionIcono = '➕ ';
-            else if (reg.accion === 'editar') accionIcono = '✏️ ';
-            else if (reg.accion === 'eliminar') accionIcono = '🗑️ ';
-            else if (reg.accion === 'login') accionIcono = '🔐 ';
-            else if (reg.accion === 'logout') accionIcono = '🚪 ';
-            else if (reg.accion === 'usuario') accionIcono = '👥 ';
-            else if (reg.accion === 'entidad') accionIcono = '🏢 ';
-            
-            row.insertCell(3).innerHTML = accionIcono + reg.accion;
-            row.insertCell(4).innerHTML = reg.detalles;
-            row.insertCell(5).innerHTML = `<button class="btn-delete" style="padding:4px 8px" onclick="eliminarRegistroAuditoria('${reg.id}')">Eliminar</button>`;
-        });
-    }
-    
-    function filtrarAuditoria() {
-        cargarAuditoria();
-    }
-    
-    function limpiarFiltrosAuditoria() {
-        document.getElementById('auditFilterUsuario').value = '';
-        document.getElementById('auditFilterAccion').value = '';
-        cargarAuditoria();
-    }
-    
-    function eliminarRegistroAuditoria(id) {
-        if (confirm('¿Eliminar este registro de auditoría?')) {
-            auditoria = auditoria.filter(a => a.id != id);
-            guardarDatos();
-            cargarAuditoria();
-            alert('Registro eliminado');
-        }
-    }
-    
-    function eliminarTodasAuditoria() {
-        if (confirm('⚠️ ¿Eliminar TODOS los registros de auditoría? Esta acción no se puede deshacer.')) {
-            auditoria = [];
-            guardarDatos();
-            cargarAuditoria();
-            alert('Todos los registros de auditoría han sido eliminados');
-        }
-    }
-    
-    // ==================== NAVEGACIÓN ====================
-    function showSection(section) {
-        document.getElementById('dashboardSection').style.display = 'none';
-        document.getElementById('searchSection').style.display = 'none';
-        document.getElementById('workersListSection').style.display = 'none';
-        document.getElementById('reportsSection').style.display = 'none';
-        document.getElementById('registerSection').style.display = 'none';
-        document.getElementById('userManagementSection').style.display = 'none';
-        document.getElementById('entidadesSection').style.display = 'none';
-        document.getElementById('auditoriaSection').style.display = 'none';
-        
-        if (section === 'dashboard') document.getElementById('dashboardSection').style.display = 'block';
-        else if (section === 'search') document.getElementById('searchSection').style.display = 'block';
-        else if (section === 'workersList') document.getElementById('workersListSection').style.display = 'block';
-        else if (section === 'reports') { document.getElementById('reportsSection').style.display = 'block'; actualizarReportes(); }
-        else if (section === 'register' && (currentUser.rol === 'superadmin' || currentUser.rol === 'admin_entidad')) document.getElementById('registerSection').style.display = 'block';
-        else if (section === 'userManagement' && currentUser.rol === 'superadmin') document.getElementById('userManagementSection').style.display = 'block';
-        else if (section === 'entidades' && currentUser.rol === 'superadmin') document.getElementById('entidadesSection').style.display = 'block';
-        else if (section === 'auditoria' && currentUser.rol === 'superadmin') { document.getElementById('auditoriaSection').style.display = 'block'; cargarAuditoria(); }
-    }
-    
-    // ==================== DASHBOARD ====================
-    function actualizarDashboard() {
-        const trabajadoresVisibles = getTrabajadoresVisibles();
-        const total = trabajadoresVisibles.length;
-        const menores35 = trabajadoresVisibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
-        const militantesPCC = trabajadoresVisibles.filter(t => t.militancia === 'pcc').length;
-        const militantesUJC = trabajadoresVisibles.filter(t => t.militancia === 'ujc').length;
-        const universitarios = trabajadoresVisibles.filter(t => t.nivel_escolar === 'universitario' || t.nivel_escolar === 'postgrado').length;
-        
-        document.getElementById('dashboardCards').innerHTML = `
-            <div class="card"><h3>Total Trabajadores</h3><div class="number">${total}</div></div>
-            <div class="card"><h3>Menores de 35 años</h3><div class="number">${menores35}</div></div>
-            <div class="card"><h3>Militantes PCC</h3><div class="number">${militantesPCC}</div></div>
-            <div class="card"><h3>Militantes UJC</h3><div class="number">${militantesUJC}</div></div>
-            <div class="card"><h3>Universitarios</h3><div class="number">${universitarios}</div></div>
-        `;
-        
-        const entidadesStats = {};
-        trabajadoresVisibles.forEach(t => { entidadesStats[t.entidad] = (entidadesStats[t.entidad] || 0) + 1; });
-        let entidadHtml = '';
-        for (const [ent, count] of Object.entries(entidadesStats)) {
-            entidadHtml += `<div class="stat-card"><strong>${ent}</strong><br>${count} trabajadores</div>`;
-        }
-        document.getElementById('entidadStats').innerHTML = entidadHtml || '<p>No hay datos</p>';
-    }
-    
-    function actualizarListaTrabajadores(filtrados = null) {
-        const lista = filtrados || getTrabajadoresVisibles();
-        const tbody = document.getElementById('workersTableBody');
-        tbody.innerHTML = '';
-        lista.forEach(t => {
-            const row = tbody.insertRow();
-            row.style.cursor = 'pointer';
-            row.onclick = () => verFichaCompleta(t);
-            row.insertCell(0).innerHTML = t.ci;
-            row.insertCell(1).innerHTML = t.nombre;
-            row.insertCell(2).innerHTML = t.telefono || 'N/A';
-            row.insertCell(3).innerHTML = t.entidad;
-            row.insertCell(4).innerHTML = t.cargo;
-            row.insertCell(5).innerHTML = calcularEdad(t.fecha_nacimiento);
-            row.insertCell(6).innerHTML = `<span class="badge badge-${t.militancia === 'pcc' ? 'pcc' : (t.militancia === 'ujc' ? 'ujc' : 'none')}">${getMilitanciaLabel(t.militancia)}</span>`;
-        });
-    }
-    
-    function filtrarTrabajadores() {
+    // ==================== BÚSQUEDAS ====================
+    function buscarAvanzada() {
         const nombre = document.getElementById('filterNombre')?.value.toLowerCase() || '';
         const ci = document.getElementById('filterCI')?.value || '';
         const entidad = document.getElementById('filterEntidad')?.value || '';
         const militancia = document.getElementById('filterMilitancia')?.value || '';
         
         const trabajadoresVisibles = getTrabajadoresVisibles();
+        
+        let filtrosActivos = [];
+        if (nombre) filtrosActivos.push(`nombre: "${nombre}"`);
+        if (ci) filtrosActivos.push(`CI: "${ci}"`);
+        if (entidad) filtrosActivos.push(`entidad: "${entidad}"`);
+        if (militancia) filtrosActivos.push(`militancia: "${militancia}"`);
+        
+        if (filtrosActivos.length > 0) {
+            let tipoBusqueda = 'busqueda_avanzada';
+            if (nombre && !ci && !entidad && !militancia) tipoBusqueda = 'busqueda_nombre';
+            else if (ci && !nombre && !entidad && !militancia) tipoBusqueda = 'busqueda_ci';
+            else if (militancia && !nombre && !ci && !entidad) tipoBusqueda = 'busqueda_militancia';
+            else if (entidad && !nombre && !ci && !militancia) tipoBusqueda = 'busqueda_entidad';
+            
+            const resultados = trabajadoresVisibles.filter(t => {
+                if (nombre && !t.nombre.toLowerCase().includes(nombre)) return false;
+                if (ci && !t.ci.includes(ci)) return false;
+                if (entidad && t.entidad !== entidad) return false;
+                if (militancia && t.militancia !== militancia) return false;
+                return true;
+            });
+            
+            registrarAuditoria(tipoBusqueda, `Filtros: ${filtrosActivos.join(', ')} - Resultados: ${resultados.length}`);
+        }
+        
         const filtrados = trabajadoresVisibles.filter(t => {
             if (nombre && !t.nombre.toLowerCase().includes(nombre)) return false;
             if (ci && !t.ci.includes(ci)) return false;
@@ -1419,30 +624,21 @@
             } else {
                 let html = '<div class="data-table"><table style="width:100%"><thead><tr><th>CI</th><th>Nombre</th><th>Teléfono</th><th>Entidad</th><th>Cargo</th><th>Edad</th><th>Militancia</th></tr></thead><tbody>';
                 filtrados.forEach(t => {
-                    html += `<tr onclick="verFichaCompleta(${JSON.stringify(t).replace(/"/g, '&quot;')})" style="cursor:pointer">
+                    html += `<tr onclick='verFichaCompleta(${JSON.stringify(t).replace(/'/g, "\\'")})' style="cursor:pointer">
                         <td>${t.ci}</td><td>${t.nombre}</td><td>${t.telefono || 'N/A'}</td>
                         <td>${t.entidad}</td><td>${t.cargo}</td>
                         <td>${calcularEdad(t.fecha_nacimiento)}</td>
                         <td><span class="badge badge-${t.militancia === 'pcc' ? 'pcc' : (t.militancia === 'ujc' ? 'ujc' : 'none')}">${getMilitanciaLabel(t.militancia)}</span></td>
                     </tr>`;
                 });
-                html += '</tbody><table></div>';
+                html += '</tbody></table></div>';
                 container.innerHTML = html;
             }
         }
         actualizarListaTrabajadores(filtrados);
     }
     
-    function cargarFiltrosEntidad() {
-        const entidadesUnicas = [...new Set(getTrabajadoresVisibles().map(t => t.entidad))];
-        const select = document.getElementById('filterEntidad');
-        if (select) {
-            select.innerHTML = '<option value="">Todas las entidades</option>' + entidadesUnicas.map(e => `<option value="${e}">${e}</option>`).join('');
-        }
-    }
-    
-    // ==================== BÚSQUEDA Y FICHA ====================
-    function buscarPorCI() {
+    async function buscarPorCI() {
         const ci = document.getElementById('ciSearchInput').value.trim();
         const resultDiv = document.getElementById('searchResult');
         if (!ci) {
@@ -1451,10 +647,10 @@
         }
         const trabajador = getTrabajadoresVisibles().find(t => t.ci === ci);
         if (trabajador) {
-            registrarAuditoria('busqueda', `Buscó trabajador con CI: ${ci} - Resultado: Encontrado - ${trabajador.nombre}`);
+            await registrarAuditoria('busqueda_ci', `Buscó CI: ${ci} - Resultado: Encontrado - ${trabajador.nombre}`);
             resultDiv.innerHTML = generarFichaHTML(trabajador);
         } else {
-            registrarAuditoria('busqueda', `Buscó trabajador con CI: ${ci} - Resultado: No encontrado`);
+            await registrarAuditoria('busqueda_ci', `Buscó CI: ${ci} - Resultado: No encontrado`);
             resultDiv.innerHTML = `<p style="color:red">❌ No se encontró trabajador con CI: ${ci}</p>`;
         }
     }
@@ -1510,6 +706,354 @@
         `;
     }
     
+    // ==================== GESTIÓN DE ENTIDADES ====================
+    async function cargarEntidades() {
+        const { data, error } = await supabase.from('entidades').select('*').order('nombre');
+        if (error) { console.error(error); return; }
+        entidades = data.map(e => e.nombre);
+        cargarSelectsEntidades();
+        if (currentUserRol === 'superadmin') {
+            const tbody = document.getElementById('entidadesTableBody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                entidades.forEach(ent => {
+                    const row = tbody.insertRow();
+                    row.insertCell(0).innerHTML = ent;
+                    row.insertCell(1).innerHTML = new Date().toLocaleDateString();
+                    row.insertCell(2).innerHTML = `<button class="btn-delete" style="padding:4px 12px" onclick="eliminarEntidad('${ent}')">Eliminar</button>`;
+                });
+            }
+        }
+    }
+    
+    async function agregarEntidad(nombre) {
+        if (entidades.includes(nombre)) {
+            alert('La entidad ya existe');
+            return false;
+        }
+        try {
+            const { error } = await supabase.from('entidades').insert([{ nombre: nombre }]);
+            if (error) throw error;
+            await registrarAuditoria('entidad', `Agregó nueva entidad: ${nombre}`);
+            await cargarEntidades();
+            alert(`Entidad "${nombre}" agregada correctamente`);
+            return true;
+        } catch (error) {
+            alert('Error: ' + error.message);
+            return false;
+        }
+    }
+    
+    async function eliminarEntidad(nombre) {
+        const trabajadoresEnEntidad = trabajadores.filter(t => t.entidad === nombre);
+        if (trabajadoresEnEntidad.length > 0) {
+            alert(`No se puede eliminar la entidad "${nombre}" porque tiene ${trabajadoresEnEntidad.length} trabajadores asociados.`);
+            return false;
+        }
+        if (confirm(`¿Eliminar la entidad "${nombre}"?`)) {
+            try {
+                const { error } = await supabase.from('entidades').delete().eq('nombre', nombre);
+                if (error) throw error;
+                await registrarAuditoria('entidad', `Eliminó entidad: ${nombre}`);
+                await cargarEntidades();
+                alert('Entidad eliminada');
+                return true;
+            } catch (error) {
+                alert('Error: ' + error.message);
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    function cargarSelectsEntidades() {
+        const selects = ['reg_entidad', 'edit_entidad', 'newUserEntidad', 'filterEntidad'];
+        const opciones = '<option value="">Seleccione una entidad</option>' + entidades.map(e => `<option value="${e}">${e}</option>`).join('');
+        
+        selects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            if (select) {
+                const valorActual = select.value;
+                select.innerHTML = opciones;
+                if (valorActual && entidades.includes(valorActual)) {
+                    select.value = valorActual;
+                }
+            }
+        });
+        
+        const auditFilterUsuario = document.getElementById('auditFilterUsuario');
+        if (auditFilterUsuario && usuarios.length > 0) {
+            auditFilterUsuario.innerHTML = '<option value="">Todos los usuarios</option>' + 
+                [...new Set(usuarios.map(u => u.email))].map(u => `<option value="${u}">${u}</option>`).join('');
+        }
+    }
+    
+    // ==================== GESTIÓN DE USUARIOS ====================
+    async function cargarUsuarios() {
+        if (currentUserRol !== 'superadmin') return;
+        const { data, error } = await supabase.from('usuarios').select('*');
+        if (error) { console.error(error); return; }
+        usuarios = data;
+        const tbody = document.getElementById('usuariosTableBody');
+        if (tbody) {
+            tbody.innerHTML = '';
+            usuarios.forEach(user => {
+                if (user.id === currentUser?.id) return;
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = user.email;
+                row.insertCell(1).innerHTML = `<span class="badge ${user.rol === 'superadmin' ? 'badge-superadmin' : (user.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(user.rol)}</span>`;
+                row.insertCell(2).innerHTML = user.entidad_asignada || 'Todas';
+                row.insertCell(3).innerHTML = new Date(user.created_at).toLocaleDateString();
+                row.insertCell(4).innerHTML = `<button class="btn-delete" style="padding:4px 12px" onclick="eliminarUsuario('${user.id}', '${user.email}')">Eliminar</button>`;
+            });
+        }
+        cargarSelectsEntidades();
+    }
+    
+    async function crearUsuario(email, password, rol, entidadAsignada = null) {
+        if (currentUserRol !== 'superadmin') {
+            alert('Solo el Super Administrador puede crear usuarios');
+            return false;
+        }
+        if (usuarios.find(u => u.email === email)) {
+            alert('El correo ya está registrado');
+            return false;
+        }
+        if (password.length < 6) {
+            alert('La contraseña debe tener al menos 6 caracteres');
+            return false;
+        }
+        try {
+            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+                email: email,
+                password: password,
+                email_confirm: true
+            });
+            if (authError) throw authError;
+            
+            const { error: dbError } = await supabase.from('usuarios').insert([{
+                id: authData.user.id,
+                email: email,
+                rol: rol,
+                entidad_asignada: entidadAsignada
+            }]);
+            if (dbError) throw dbError;
+            
+            await registrarAuditoria('usuario', `Creó usuario: ${email} con rol ${rol}`);
+            await cargarUsuarios();
+            alert(`Usuario ${email} creado correctamente`);
+            return true;
+        } catch (error) {
+            alert('Error: ' + error.message);
+            return false;
+        }
+    }
+    
+    async function eliminarUsuario(id, email) {
+        if (currentUserRol !== 'superadmin') return;
+        if (currentUser?.id === id) {
+            alert('No puedes eliminar tu propio usuario');
+            return;
+        }
+        if (confirm(`¿Eliminar usuario ${email}?`)) {
+            try {
+                await supabase.auth.admin.deleteUser(id);
+                await supabase.from('usuarios').delete().eq('id', id);
+                await registrarAuditoria('usuario', `Eliminó usuario: ${email}`);
+                await cargarUsuarios();
+                alert('Usuario eliminado');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    }
+    
+    function toggleEntidadField() {
+        const rol = document.getElementById('newUserRole').value;
+        const entidadField = document.getElementById('entidadField');
+        entidadField.style.display = rol === 'admin_entidad' ? 'block' : 'none';
+    }
+    
+    // ==================== AUDITORÍA ====================
+    async function cargarAuditoria() {
+        if (currentUserRol !== 'superadmin') return;
+        const filtroUsuario = document.getElementById('auditFilterUsuario').value;
+        const filtroAccion = document.getElementById('auditFilterAccion').value;
+        
+        let query = supabase.from('auditoria').select('*').order('fecha', { ascending: false });
+        if (filtroUsuario) query = query.eq('usuario', filtroUsuario);
+        if (filtroAccion) query = query.eq('accion', filtroAccion);
+        
+        const { data, error } = await query;
+        if (error) { console.error(error); return; }
+        
+        const tbody = document.getElementById('auditoriaTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No hay registros de auditoría</td></tr>';
+            return;
+        }
+        
+        data.forEach(reg => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = new Date(reg.fecha).toLocaleString();
+            row.insertCell(1).innerHTML = reg.usuario;
+            row.insertCell(2).innerHTML = `<span class="badge ${reg.rol === 'superadmin' ? 'badge-superadmin' : (reg.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(reg.rol)}</span>`;
+            
+            let accionIcono = '', accionTexto = '';
+            if (reg.accion === 'busqueda_ci') { accionIcono = '🔍 '; accionTexto = 'Búsqueda por CI'; }
+            else if (reg.accion === 'busqueda_nombre') { accionIcono = '🔎 '; accionTexto = 'Búsqueda por Nombre'; }
+            else if (reg.accion === 'busqueda_militancia') { accionIcono = '📊 '; accionTexto = 'Búsqueda por Militancia'; }
+            else if (reg.accion === 'busqueda_entidad') { accionIcono = '🏢 '; accionTexto = 'Búsqueda por Entidad'; }
+            else if (reg.accion === 'busqueda_avanzada') { accionIcono = '🔬 '; accionTexto = 'Búsqueda Avanzada'; }
+            else if (reg.accion === 'crear') { accionIcono = '➕ '; accionTexto = 'Creación'; }
+            else if (reg.accion === 'editar') { accionIcono = '✏️ '; accionTexto = 'Edición'; }
+            else if (reg.accion === 'eliminar') { accionIcono = '🗑️ '; accionTexto = 'Eliminación'; }
+            else if (reg.accion === 'login') { accionIcono = '🔐 '; accionTexto = 'Inicio de Sesión'; }
+            else if (reg.accion === 'logout') { accionIcono = '🚪 '; accionTexto = 'Cierre de Sesión'; }
+            else if (reg.accion === 'usuario') { accionIcono = '👥 '; accionTexto = 'Gestión de Usuarios'; }
+            else if (reg.accion === 'entidad') { accionIcono = '🏢 '; accionTexto = 'Gestión de Entidades'; }
+            else { accionIcono = '📌 '; accionTexto = reg.accion; }
+            
+            row.insertCell(3).innerHTML = accionIcono + accionTexto;
+            row.insertCell(4).innerHTML = reg.detalles;
+            row.insertCell(5).innerHTML = `<button class="btn-delete" style="padding:4px 8px" onclick="eliminarRegistroAuditoria(${reg.id})">Eliminar</button>`;
+        });
+    }
+    
+    function limpiarFiltrosAuditoria() {
+        document.getElementById('auditFilterUsuario').value = '';
+        document.getElementById('auditFilterAccion').value = '';
+        cargarAuditoria();
+    }
+    
+    async function eliminarRegistroAuditoria(id) {
+        if (confirm('¿Eliminar este registro de auditoría?')) {
+            await supabase.from('auditoria').delete().eq('id', id);
+            cargarAuditoria();
+            alert('Registro eliminado');
+        }
+    }
+    
+    async function eliminarTodasAuditoria() {
+        if (confirm('⚠️ ¿Eliminar TODOS los registros de auditoría? Esta acción no se puede deshacer.')) {
+            await supabase.from('auditoria').delete().neq('id', 0);
+            cargarAuditoria();
+            alert('Todos los registros de auditoría han sido eliminados');
+        }
+    }
+    
+    // ==================== NAVEGACIÓN Y UI ====================
+    function showSection(section) {
+        const sections = ['dashboardSection', 'searchSection', 'workersListSection', 'reportsSection', 'registerSection', 'userManagementSection', 'entidadesSection', 'auditoriaSection'];
+        sections.forEach(s => { const el = document.getElementById(s); if (el) el.style.display = 'none'; });
+        
+        const el = document.getElementById(section);
+        if (el) el.style.display = 'block';
+        if (section === 'reports') actualizarReportes();
+        if (section === 'auditoria') cargarAuditoria();
+    }
+    
+    function actualizarDashboard() {
+        const trabajadoresVisibles = getTrabajadoresVisibles();
+        const total = trabajadoresVisibles.length;
+        const menores35 = trabajadoresVisibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
+        const militantesPCC = trabajadoresVisibles.filter(t => t.militancia === 'pcc').length;
+        const militantesUJC = trabajadoresVisibles.filter(t => t.militancia === 'ujc').length;
+        const universitarios = trabajadoresVisibles.filter(t => t.nivel_escolar === 'universitario' || t.nivel_escolar === 'postgrado').length;
+        
+        const dashboardCards = document.getElementById('dashboardCards');
+        if (dashboardCards) {
+            dashboardCards.innerHTML = `
+                <div class="card"><h3>Total Trabajadores</h3><div class="number">${total}</div></div>
+                <div class="card"><h3>Menores de 35 años</h3><div class="number">${menores35}</div></div>
+                <div class="card"><h3>Militantes PCC</h3><div class="number">${militantesPCC}</div></div>
+                <div class="card"><h3>Militantes UJC</h3><div class="number">${militantesUJC}</div></div>
+                <div class="card"><h3>Universitarios</h3><div class="number">${universitarios}</div></div>
+            `;
+        }
+        
+        const entidadesStats = {};
+        trabajadoresVisibles.forEach(t => { entidadesStats[t.entidad] = (entidadesStats[t.entidad] || 0) + 1; });
+        let entidadHtml = '';
+        for (const [ent, count] of Object.entries(entidadesStats)) {
+            entidadHtml += `<div class="stat-card"><strong>${ent}</strong><br>${count} trabajadores</div>`;
+        }
+        const entidadStats = document.getElementById('entidadStats');
+        if (entidadStats) entidadStats.innerHTML = entidadHtml || '<p>No hay datos</p>';
+    }
+    
+    function actualizarListaTrabajadores(filtrados = null) {
+        const lista = filtrados || getTrabajadoresVisibles();
+        const tbody = document.getElementById('workersTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        lista.forEach(t => {
+            const row = tbody.insertRow();
+            row.style.cursor = 'pointer';
+            row.onclick = () => verFichaCompleta(t);
+            row.insertCell(0).innerHTML = t.ci;
+            row.insertCell(1).innerHTML = t.nombre;
+            row.insertCell(2).innerHTML = t.telefono || 'N/A';
+            row.insertCell(3).innerHTML = t.entidad;
+            row.insertCell(4).innerHTML = t.cargo;
+            row.insertCell(5).innerHTML = calcularEdad(t.fecha_nacimiento);
+            row.insertCell(6).innerHTML = `<span class="badge badge-${t.militancia === 'pcc' ? 'pcc' : (t.militancia === 'ujc' ? 'ujc' : 'none')}">${getMilitanciaLabel(t.militancia)}</span>`;
+        });
+    }
+    
+    function cargarFiltrosEntidad() {
+        const entidadesUnicas = [...new Set(getTrabajadoresVisibles().map(t => t.entidad))];
+        const select = document.getElementById('filterEntidad');
+        if (select) {
+            select.innerHTML = '<option value="">Todas las entidades</option>' + entidadesUnicas.map(e => `<option value="${e}">${e}</option>`).join('');
+        }
+    }
+    
+    function actualizarReportes() {
+        const trabajadoresVisibles = getTrabajadoresVisibles();
+        const total = trabajadoresVisibles.length;
+        if (total === 0) return;
+        
+        const menores35 = trabajadoresVisibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
+        const militantesPCC = trabajadoresVisibles.filter(t => t.militancia === 'pcc').length;
+        const militantesUJC = trabajadoresVisibles.filter(t => t.militancia === 'ujc').length;
+        
+        const reportCards = document.getElementById('reportCards');
+        if (reportCards) {
+            reportCards.innerHTML = `
+                <div class="card"><h3>Total</h3><div class="number">${total}</div></div>
+                <div class="card"><h3>Menores 35</h3><div class="number">${menores35} (${Math.round(menores35/total*100)}%)</div></div>
+                <div class="card"><h3>PCC</h3><div class="number">${militantesPCC} (${Math.round(militantesPCC/total*100)}%)</div></div>
+                <div class="card"><h3>UJC</h3><div class="number">${militantesUJC} (${Math.round(militantesUJC/total*100)}%)</div></div>
+            `;
+        }
+        
+        const escolaridades = { primaria:0, secundaria:0, preuniversitario:0, tecnico_medio:0, universitario:0, postgrado:0 };
+        trabajadoresVisibles.forEach(t => { if(escolaridades[t.nivel_escolar]!==undefined) escolaridades[t.nivel_escolar]++; });
+        let escolarHtml = '<div class="stats-grid">';
+        for (const [nivel, count] of Object.entries(escolaridades)) {
+            if (count > 0) {
+                escolarHtml += `<div class="stat-card"><strong>${getNivelLabel(nivel)}</strong><br>${count} (${Math.round(count/total*100)}%)</div>`;
+            }
+        }
+        escolarHtml += '</div>';
+        const escolaridadStats = document.getElementById('escolaridadStats');
+        if (escolaridadStats) escolaridadStats.innerHTML = escolarHtml;
+        
+        const militancias = { pcc:0, ujc:0, ninguna:0 };
+        trabajadoresVisibles.forEach(t => { militancias[t.militancia]++; });
+        let militHtml = '<div class="stats-grid">';
+        militHtml += `<div class="stat-card"><strong>PCC</strong><br>${militancias.pcc} (${Math.round(militancias.pcc/total*100)}%)</div>`;
+        militHtml += `<div class="stat-card"><strong>UJC</strong><br>${militancias.ujc} (${Math.round(militancias.ujc/total*100)}%)</div>`;
+        militHtml += `<div class="stat-card"><strong>No militantes</strong><br>${militancias.ninguna} (${Math.round(militancias.ninguna/total*100)}%)</div>`;
+        militHtml += '</div>';
+        const militanciaStats = document.getElementById('militanciaStats');
+        if (militanciaStats) militanciaStats.innerHTML = militHtml;
+    }
+    
     function abrirEditarTrabajador(id) {
         const t = trabajadores.find(t => t.id === id);
         if (!t) return;
@@ -1529,7 +1073,7 @@
         document.getElementById('edit_licencia').value = t.licencia || '';
         document.getElementById('edit_vehiculo').value = t.vehiculo || '';
         
-        if (currentUser.rol === 'admin_entidad') {
+        if (currentUserRol === 'admin_entidad') {
             document.getElementById('edit_entidad').disabled = true;
         } else {
             document.getElementById('edit_entidad').disabled = false;
@@ -1538,76 +1082,18 @@
         document.getElementById('editModal').style.display = 'flex';
     }
     
-    function cerrarModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-    
-    function abrirModalRegistro() {
-        document.getElementById('registerForm').reset();
-        showSection('register');
-    }
-    
-    function abrirModalCrearUsuario() {
-        document.getElementById('crearUsuarioForm').reset();
-        document.getElementById('entidadField').style.display = 'none';
-        document.getElementById('crearUsuarioModal').style.display = 'flex';
-    }
-    
-    function cerrarModalUsuario() {
-        document.getElementById('crearUsuarioModal').style.display = 'none';
-    }
-    
-    function abrirModalCrearEntidad() {
-        document.getElementById('crearEntidadForm').reset();
-        document.getElementById('crearEntidadModal').style.display = 'flex';
-    }
-    
-    function cerrarModalEntidad() {
-        document.getElementById('crearEntidadModal').style.display = 'none';
-    }
-    
-    function actualizarReportes() {
-        const trabajadoresVisibles = getTrabajadoresVisibles();
-        const total = trabajadoresVisibles.length;
-        if (total === 0) return;
-        
-        const menores35 = trabajadoresVisibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
-        const militantesPCC = trabajadoresVisibles.filter(t => t.militancia === 'pcc').length;
-        const militantesUJC = trabajadoresVisibles.filter(t => t.militancia === 'ujc').length;
-        
-        document.getElementById('reportCards').innerHTML = `
-            <div class="card"><h3>Total</h3><div class="number">${total}</div></div>
-            <div class="card"><h3>Menores 35</h3><div class="number">${menores35} (${Math.round(menores35/total*100)}%)</div></div>
-            <div class="card"><h3>PCC</h3><div class="number">${militantesPCC} (${Math.round(militantesPCC/total*100)}%)</div></div>
-            <div class="card"><h3>UJC</h3><div class="number">${militantesUJC} (${Math.round(militantesUJC/total*100)}%)</div></div>
-        `;
-        
-        const escolaridades = { primaria:0, secundaria:0, preuniversitario:0, tecnico_medio:0, universitario:0, postgrado:0 };
-        trabajadoresVisibles.forEach(t => { if(escolaridades[t.nivel_escolar]!==undefined) escolaridades[t.nivel_escolar]++; });
-        let escolarHtml = '<div class="stats-grid">';
-        for (const [nivel, count] of Object.entries(escolaridades)) {
-            if (count > 0) {
-                escolarHtml += `<div class="stat-card"><strong>${getNivelLabel(nivel)}</strong><br>${count} (${Math.round(count/total*100)}%)</div>`;
-            }
-        }
-        escolarHtml += '</div>';
-        document.getElementById('escolaridadStats').innerHTML = escolarHtml;
-        
-        const militancias = { pcc:0, ujc:0, ninguna:0 };
-        trabajadoresVisibles.forEach(t => { militancias[t.militancia]++; });
-        let militHtml = '<div class="stats-grid">';
-        militHtml += `<div class="stat-card"><strong>PCC</strong><br>${militancias.pcc} (${Math.round(militancias.pcc/total*100)}%)</div>`;
-        militHtml += `<div class="stat-card"><strong>UJC</strong><br>${militancias.ujc} (${Math.round(militancias.ujc/total*100)}%)</div>`;
-        militHtml += `<div class="stat-card"><strong>No militantes</strong><br>${militancias.ninguna} (${Math.round(militancias.ninguna/total*100)}%)</div>`;
-        militHtml += '</div>';
-        document.getElementById('militanciaStats').innerHTML = militHtml;
-    }
+    function cerrarModal() { document.getElementById('editModal').style.display = 'none'; }
+    function abrirModalRegistro() { document.getElementById('registerForm').reset(); showSection('register'); }
+    function abrirModalCrearUsuario() { document.getElementById('crearUsuarioForm').reset(); document.getElementById('entidadField').style.display = 'none'; document.getElementById('crearUsuarioModal').style.display = 'flex'; }
+    function cerrarModalUsuario() { document.getElementById('crearUsuarioModal').style.display = 'none'; }
+    function abrirModalCrearEntidad() { document.getElementById('crearEntidadForm').reset(); document.getElementById('crearEntidadModal').style.display = 'flex'; }
+    function cerrarModalEntidad() { document.getElementById('crearEntidadModal').style.display = 'none'; }
     
     // ==================== EVENT LISTENERS ====================
-    document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+    document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const nuevo = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             ci: document.getElementById('reg_ci').value.trim(),
             nombre: document.getElementById('reg_nombre').value.trim(),
             fecha_nacimiento: document.getElementById('reg_fecha_nacimiento').value,
@@ -1622,11 +1108,12 @@
             licencia: document.getElementById('reg_licencia').value,
             vehiculo: document.getElementById('reg_vehiculo').value
         };
-        registrarTrabajador(nuevo);
+        if (!nuevo.entidad) { alert('Debe seleccionar una entidad'); return; }
+        await registrarTrabajador(nuevo);
         showSection('workersList');
     });
     
-    document.getElementById('editForm')?.addEventListener('submit', function(e) {
+    document.getElementById('editForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = document.getElementById('edit_id').value;
         const datos = {
@@ -1643,46 +1130,44 @@
             licencia: document.getElementById('edit_licencia').value,
             vehiculo: document.getElementById('edit_vehiculo').value
         };
-        editarTrabajador(id, datos);
+        if (!datos.entidad) { alert('Debe seleccionar una entidad'); return; }
+        await editarTrabajador(id, datos);
         cerrarModal();
     });
     
-    document.getElementById('crearUsuarioForm')?.addEventListener('submit', function(e) {
+    document.getElementById('crearUsuarioForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const username = document.getElementById('newUsername').value;
+        const email = document.getElementById('newUsername').value.trim();
         const password = document.getElementById('newPassword').value;
         const rol = document.getElementById('newUserRole').value;
-        const entidadAsignada = rol === 'admin_entidad' ? document.getElementById('newUserEntidad').value : null;
+        let entidadAsignada = null;
         
-        if (rol === 'admin_entidad' && !entidadAsignada) {
-            alert('Debe seleccionar una entidad para el administrador');
-            return;
+        if (!email || !password) { alert('Complete todos los campos'); return; }
+        if (rol === 'admin_entidad') {
+            entidadAsignada = document.getElementById('newUserEntidad').value;
+            if (!entidadAsignada) { alert('Debe seleccionar una entidad para el administrador'); return; }
         }
         
-        crearUsuario(username, password, rol, entidadAsignada);
+        await crearUsuario(email, password, rol, entidadAsignada);
         cerrarModalUsuario();
     });
     
-    document.getElementById('crearEntidadForm')?.addEventListener('submit', function(e) {
+    document.getElementById('crearEntidadForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const nombre = document.getElementById('newEntidadNombre').value.trim();
-        if (!nombre) {
-            alert('Ingrese el nombre de la entidad');
-            return;
-        }
-        agregarEntidad(nombre);
+        if (!nombre) { alert('Ingrese el nombre de la entidad'); return; }
+        await agregarEntidad(nombre);
         cerrarModalEntidad();
     });
     
-    // Inicializar
-    cargarDatos();
-    
-    // Cerrar modales al hacer clic fuera
     window.onclick = function(event) {
         if (event.target === document.getElementById('editModal')) cerrarModal();
         if (event.target === document.getElementById('crearUsuarioModal')) cerrarModalUsuario();
         if (event.target === document.getElementById('crearEntidadModal')) cerrarModalEntidad();
     }
+    
+    // Inicializar
+    cargarEntidades();
 </script>
 </body>
-</html>
+                            </html>
