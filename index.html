@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIGEH-TRANS - Prueba Simple</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="font-family: Arial; text-align: center; padding: 50px;">
+    <h1>🚛 SIGEH-TRANS</h1>
+    <p>Prueba de conexión - Haz clic en el botón y mira el resultado</p>
+    
+    <input type="email" id="email" placeholder="Correo electrónico" style="padding: 10px; width: 280px; margin: 10px;"><br>
+    <input type="password" id="pass" placeholder="Contraseña" style="padding: 10px; width: 280px; margin: 10px;"><br>
+    <button onclick="login()" style="padding: 12px 40px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">INICIAR SESIÓN</button>
+    
+    <div id="resultado" style="margin-top: 30px; padding: 15px; border-radius: 8px; font-weight: bold;"></div>
+    
+    <hr style="margin: 30px;">
+    <p style="font-size: 12px; color: #999;">Desarrollado por Reynier Velázquez Morales - 2026</p>
+
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = "https://jnmhbsvjnsvagcdfujok.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubWhic3ZqbnN2YWdjZGZ1am9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzQ5NjUsImV4cCI6MjA5MTE1MDk2NX0.n6cSbVkX0u23zshq49O0FPCwLKS3MP-o8J8EyroI75E";
+        
+        // Crear cliente de Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('pass').value;
+            const resultado = document.getElementById('resultado');
+            
+            // Validar campos
+            if (!email || !password) {
+                resultado.innerHTML = '❌ ERROR: Escribe correo y contraseña';
+                resultado.style.backgroundColor = '#fee';
+                resultado.style.color = 'red';
+                return;
+            }
+            
+            // Mostrar que está procesando
+            resultado.innerHTML = '⏳ Conectando con Supabase...';
+            resultado.style.backgroundColor = '#e8f4fd';
+            resultado.style.color = '#0066cc';
+            
+            try {
+                // Intentar login
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    // Error de autenticación
+                    resultado.innerHTML = '❌ ERROR: ' + error.message;
+                    resultado.style.backgroundColor = '#fee';
+                    resultado.style.color = 'red';
+                } else {
+                    // Login exitoso
+                    resultado.innerHTML = '✅ ¡LOGIN EXITOSO! Bienvenido ' + data.user.email;
+                    resultado.style.backgroundColor = '#efe';
+                    resultado.style.color = 'green';
+                }
+                
+            } catch (error) {
+                resultado.innerHTML = '❌ ERROR DE CONEXIÓN: ' + error.message;
+                resultado.style.backgroundColor = '#fee';
+                resultado.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>
