@@ -1,116 +1,107 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGEH-TRANS - Login</title>
+    <title>TEST - SIGEH-TRANS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-        }
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        h1 { color: #667eea; margin-bottom: 5px; }
-        .subtitle { color: #666; margin-bottom: 30px; font-size: 12px; }
-        input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .error-msg {
-            color: #e74c3c;
-            margin-top: 15px;
-            font-size: 14px;
-            background: #fdecea;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #999;
-        }
-    </style>
 </head>
-<body>
-    <div class="login-card">
-        <h1>🚛 SIGEH-TRANS</h1>
-        <div class="subtitle">SISTEMA DE GESTIÓN HUMANA DEL TRANSPORTE</div>
-        
-        <input type="email" id="email" placeholder="Correo electrónico">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="iniciarSesion()">Iniciar Sesión</button>
-        
-        <div id="mensaje" class="error-msg"></div>
-        <div class="footer">Desarrollado por Reynier Velázquez Morales - 2026</div>
-    </div>
+<body style="font-family: Arial; padding: 20px;">
+    <h1>🔧 TEST DE CONEXIÓN SUPABASE</h1>
+    <p>Este archivo prueba si la conexión a Supabase funciona correctamente.</p>
+    
+    <hr>
+    
+    <label><strong>Email:</strong></label><br>
+    <input type="email" id="email" style="width: 100%; padding: 10px; margin: 10px 0;" placeholder="ejemplo@correo.com">
+    
+    <label><strong>Contraseña:</strong></label><br>
+    <input type="password" id="password" style="width: 100%; padding: 10px; margin: 10px 0;">
+    
+    <button onclick="hacerLogin()" style="background: #667eea; color: white; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer;">🔐 PROBAR LOGIN</button>
+    
+    <h3>📋 Resultado:</h3>
+    <div id="resultado" style="background: #f0f0f0; padding: 15px; border-radius: 10px; font-family: monospace; white-space: pre-wrap;"></div>
+    
+    <hr>
+    <p><strong>Credenciales para probar:</strong></p>
+    <ul>
+        <li><strong>Email:</strong> <code>sigehtrans.holguin@gmail.com</code></li>
+        <li><strong>Contraseña:</strong> La que configuraste en Supabase</li>
+    </ul>
 
     <script>
         // Configuración de Supabase
         const SUPABASE_URL = "https://jnmhbsvjnsvagcdfujok.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubWhic3ZqbnN2YWdjZGZ1am9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzQ5NjUsImV4cCI6MjA5MTE1MDk2NX0.n6cSbVkX0u23zshq49O0FPCwLKS3MP-o8J8EyroI75E";
         
+        // Crear cliente de Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        async function iniciarSesion() {
+        // Función de login
+        async function hacerLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const mensajeDiv = document.getElementById('mensaje');
+            const resultadoDiv = document.getElementById('resultado');
             
-            mensajeDiv.innerHTML = '⏳ Conectando...';
+            // Limpiar resultado anterior
+            resultadoDiv.innerHTML = '';
+            resultadoDiv.style.color = 'black';
             
-            if (!email || !password) {
-                mensajeDiv.innerHTML = '❌ Ingrese correo y contraseña';
+            // Validar campos
+            if (!email) {
+                resultadoDiv.innerHTML = '❌ ERROR: Debes escribir un correo electrónico';
+                resultadoDiv.style.color = 'red';
                 return;
             }
             
+            if (!password) {
+                resultadoDiv.innerHTML = '❌ ERROR: Debes escribir una contraseña';
+                resultadoDiv.style.color = 'red';
+                return;
+            }
+            
+            // Mostrar que está procesando
+            resultadoDiv.innerHTML = '⏳ Conectando a Supabase...\n';
+            resultadoDiv.innerHTML += `📧 Email: ${email}\n`;
+            resultadoDiv.innerHTML += `🔗 URL: ${SUPABASE_URL}\n\n`;
+            
             try {
+                const inicio = Date.now();
+                
+                // Intentar login
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
                 
+                const fin = Date.now();
+                resultadoDiv.innerHTML += `⏱️ Tiempo de respuesta: ${fin - inicio} ms\n\n`;
+                
                 if (error) {
-                    mensajeDiv.innerHTML = '❌ ' + error.message;
+                    // Mostrar error
+                    resultadoDiv.innerHTML += `❌ ERROR DE AUTENTICACIÓN:\n`;
+                    resultadoDiv.innerHTML += `Mensaje: ${error.message}\n`;
+                    resultadoDiv.innerHTML += `Código: ${error.status || 'sin código'}\n`;
+                    resultadoDiv.style.color = 'red';
                 } else {
-                    mensajeDiv.innerHTML = '✅ ¡Bienvenido ' + data.user.email + '!';
-                    alert('Login exitoso: ' + data.user.email);
+                    // Mostrar éxito
+                    resultadoDiv.innerHTML += `✅ ¡LOGIN EXITOSO!\n`;
+                    resultadoDiv.innerHTML += `👤 Usuario: ${data.user.email}\n`;
+                    resultadoDiv.innerHTML += `🆔 ID: ${data.user.id}\n`;
+                    resultadoDiv.innerHTML += `📅 Creado: ${data.user.created_at || 'N/A'}\n`;
+                    resultadoDiv.style.color = 'green';
                 }
-            } catch (e) {
-                mensajeDiv.innerHTML = '❌ Error: ' + e.message;
+                
+            } catch (error) {
+                resultadoDiv.innerHTML += `❌ ERROR INESPERADO:\n`;
+                resultadoDiv.innerHTML += `Mensaje: ${error.message}\n`;
+                resultadoDiv.style.color = 'red';
             }
         }
+        
+        // Mensaje de inicio
+        console.log('✅ Archivo de prueba cargado correctamente');
+        document.getElementById('resultado').innerHTML = '✅ Archivo cargado. Escribe tus credenciales y haz clic en "PROBAR LOGIN"';
     </script>
 </body>
 </html>
