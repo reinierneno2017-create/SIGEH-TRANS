@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>SIGEH-TRANS - Sistema de Gestión Humana del Transporte</title>
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -17,7 +16,8 @@
         .login-card input:focus { outline: none; border-color: #667eea; }
         .login-card button { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .login-card button:hover { opacity: 0.9; }
-        .error-msg { color: #e74c3c; margin-top: 15px; font-size: 14px; }
+        .error-msg { color: #e74c3c; margin-top: 15px; font-size: 14px; background: #fdecea; padding: 10px; border-radius: 8px; }
+        .success-msg { color: #27ae60; margin-top: 15px; font-size: 14px; background: #e8f8f5; padding: 10px; border-radius: 8px; }
         .login-footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 20px; }
         .app-container { display: none; min-height: 100vh; display: flex; flex-direction: column; }
         .navbar { background: #2c3e50; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
@@ -29,19 +29,17 @@
         .nav-links a:hover { background: #34495e; }
         .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .logout-btn { background: #e74c3c; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
-        .logout-btn:hover { background: #c0392b; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; flex: 1; }
         .dashboard-cards { display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; justify-content: flex-start; }
-        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; flex: 1; min-width: 180px; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-3px); }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; flex: 1; min-width: 180px; }
         .card h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
         .card .number { font-size: 32px; font-weight: bold; color: #667eea; }
-        @media (max-width: 768px) { .dashboard-cards { flex-direction: column; } .card { min-width: 100%; } .nav-links { justify-content: center; } .navbar { flex-direction: column; text-align: center; } .filters { flex-direction: column; } .search-box { flex-direction: column; } }
+        @media (max-width: 768px) { .dashboard-cards { flex-direction: column; } .card { min-width: 100%; } }
         .search-section { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .search-section h2, .search-section h3 { color: #667eea; margin-bottom: 20px; }
         .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
         .search-box input { flex: 1; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
-        .search-box button { padding: 15px 30px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; }
+        .search-box button { padding: 15px 30px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; }
         .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
         .filters input, .filters select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; flex: 1; min-width: 150px; }
         .worker-card { background: #f8f9fa; border-radius: 15px; padding: 25px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
@@ -49,7 +47,7 @@
         .worker-name { font-size: 24px; font-weight: bold; color: #667eea; }
         .worker-ci { color: #666; font-size: 18px; }
         .worker-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .info-section { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .info-section { background: white; border-radius: 10px; padding: 15px; }
         .info-section h4 { color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
         .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
         .info-label { font-weight: bold; color: #555; }
@@ -61,34 +59,28 @@
         .badge-superadmin { background: #9b59b6; color: white; }
         .badge-admin { background: #e67e22; color: white; }
         .badge-consultor { background: #3498db; color: white; }
-        .action-buttons { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+        .action-buttons { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
         .btn-edit { background: #f39c12; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
         .btn-delete { background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
-        .btn-add { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .btn-add:hover { background: #5a67d8; }
-        .btn-danger { background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
-        .btn-warning { background: #f39c12; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-add { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; border-radius: 20px; padding: 30px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
-        .modal-content h2 { color: #667eea; margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
         .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
         .btn-save { background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
         .btn-cancel { background: #95a5a6; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
-        .data-table { width: 100%; background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .data-table table { width: 100%; min-width: 600px; }
+        .data-table { width: 100%; background: white; border-radius: 15px; overflow-x: auto; }
         .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         .data-table th { background: #667eea; color: white; }
         .data-table tr:hover { background: #f8f9fa; cursor: pointer; }
         .stats-grid { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
-        .stat-card { background: white; border-radius: 10px; padding: 15px; text-align: center; flex: 1; min-width: 150px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stat-card { background: white; border-radius: 10px; padding: 15px; text-align: center; flex: 1; min-width: 150px; }
         .footer { text-align: center; padding: 20px; background: #2c3e50; color: #aaa; font-size: 12px; margin-top: 40px; }
-        .footer a { color: #667eea; text-decoration: none; }
+        .loading { text-align: center; padding: 40px; color: white; font-size: 18px; }
         .audit-actions { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
         .audit-actions select { padding: 8px; border-radius: 8px; border: 1px solid #ddd; flex: 1; min-width: 150px; }
-        .loading { text-align: center; padding: 40px; color: white; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -112,18 +104,15 @@
 <div id="loadingScreen" class="login-container" style="display:none;">
     <div class="login-card">
         <h1>🚛 SIGEH-TRANS</h1>
-        <div class="subtitle">Cargando datos...</div>
-        <div class="loading">⏳ Conectando con la base de datos...</div>
+        <div class="subtitle">Conectando...</div>
+        <div class="loading">⏳ Verificando credenciales...</div>
     </div>
 </div>
 
 <!-- Main App -->
 <div id="appContainer" class="app-container" style="display:none;">
     <div class="navbar">
-        <div class="logo">
-            🚛 SIGEH-TRANS
-            <small>Sistema de Gestión Humana del Transporte</small>
-        </div>
+        <div class="logo">🚛 SIGEH-TRANS <small>Sistema de Gestión Humana del Transporte</small></div>
         <div class="nav-links">
             <a onclick="showSection('dashboard')">📊 Dashboard</a>
             <a onclick="showSection('search')">🔍 Buscar</a>
@@ -284,780 +273,385 @@
 </div>
 
 <!-- Modales -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <h2>✏️ Editar Trabajador</h2>
-        <form id="editForm">
-            <input type="hidden" id="edit_id">
-            <div class="form-group"><label>CI</label><input type="text" id="edit_ci" readonly style="background:#f0f0f0"></div>
-            <div class="form-group"><label>Nombre</label><input type="text" id="edit_nombre" required></div>
-            <div class="form-group"><label>Fecha Nacimiento</label><input type="date" id="edit_fecha_nacimiento" required></div>
-            <div class="form-group"><label>Sexo</label><select id="edit_sexo"><option value="M">Masculino</option><option value="F">Femenino</option></select></div>
-            <div class="form-group"><label>Teléfono</label><input type="tel" id="edit_telefono" required></div>
-            <div class="form-group"><label>Dirección</label><textarea id="edit_direccion" rows="2"></textarea></div>
-            <div class="form-group"><label>Municipio</label><input type="text" id="edit_municipio"></div>
-            <div class="form-group"><label>Entidad</label><select id="edit_entidad" required><option value="">Seleccione una entidad</option></select></div>
-            <div class="form-group"><label>Cargo</label><input type="text" id="edit_cargo" required></div>
-            <div class="form-group"><label>Nivel Escolar</label><select id="edit_nivel_escolar"><option value="primaria">Primaria</option><option value="secundaria">Secundaria</option><option value="preuniversitario">Preuniversitario</option><option value="tecnico_medio">Técnico Medio</option><option value="universitario">Universitario</option><option value="postgrado">Postgrado</option></select></div>
-            <div class="form-group"><label>Militancia</label><select id="edit_militancia"><option value="ninguna">No militante</option><option value="ujc">UJC</option><option value="pcc">PCC</option></select></div>
-            <div class="form-group"><label>Licencia Tipo</label><input type="text" id="edit_licencia"></div>
-            <div class="form-group"><label>Vehículo Asignado</label><input type="text" id="edit_vehiculo"></div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-                <button type="submit" class="btn-save">Guardar Cambios</button>
-            </div>
-        </form>
-    </div>
-</div>
+<div id="editModal" class="modal"><div class="modal-content"><h2>✏️ Editar Trabajador</h2><form id="editForm"><input type="hidden" id="edit_id"><div class="form-group"><label>CI</label><input type="text" id="edit_ci" readonly></div><div class="form-group"><label>Nombre</label><input type="text" id="edit_nombre" required></div><div class="form-group"><label>Fecha Nacimiento</label><input type="date" id="edit_fecha_nacimiento" required></div><div class="form-group"><label>Sexo</label><select id="edit_sexo"><option value="M">Masculino</option><option value="F">Femenino</option></select></div><div class="form-group"><label>Teléfono</label><input type="tel" id="edit_telefono" required></div><div class="form-group"><label>Dirección</label><textarea id="edit_direccion" rows="2"></textarea></div><div class="form-group"><label>Municipio</label><input type="text" id="edit_municipio"></div><div class="form-group"><label>Entidad</label><select id="edit_entidad" required><option value="">Seleccione una entidad</option></select></div><div class="form-group"><label>Cargo</label><input type="text" id="edit_cargo" required></div><div class="form-group"><label>Nivel Escolar</label><select id="edit_nivel_escolar"><option value="primaria">Primaria</option><option value="secundaria">Secundaria</option><option value="preuniversitario">Preuniversitario</option><option value="tecnico_medio">Técnico Medio</option><option value="universitario">Universitario</option><option value="postgrado">Postgrado</option></select></div><div class="form-group"><label>Militancia</label><select id="edit_militancia"><option value="ninguna">No militante</option><option value="ujc">UJC</option><option value="pcc">PCC</option></select></div><div class="form-group"><label>Licencia Tipo</label><input type="text" id="edit_licencia"></div><div class="form-group"><label>Vehículo Asignado</label><input type="text" id="edit_vehiculo"></div><div class="modal-buttons"><button type="button" class="btn-cancel" onclick="cerrarModal()">Cancelar</button><button type="submit" class="btn-save">Guardar</button></div></form></div></div>
 
-<div id="crearUsuarioModal" class="modal">
-    <div class="modal-content">
-        <h2>👤 Crear Nuevo Usuario</h2>
-        <form id="crearUsuarioForm">
-            <div class="form-group"><label>Correo Electrónico *</label><input type="email" id="newUsername" required placeholder="usuario@ejemplo.cu"></div>
-            <div class="form-group"><label>Contraseña *</label><input type="password" id="newPassword" required></div>
-            <div class="form-group"><label>Rol *</label>
-                <select id="newUserRole" onchange="toggleEntidadField()">
-                    <option value="superadmin">Super Administrador (Todas las entidades)</option>
-                    <option value="admin_entidad">Administrador por Entidad</option>
-                    <option value="consultor">Consultor (Solo lectura)</option>
-                </select>
-            </div>
-            <div class="form-group" id="entidadField" style="display:none;">
-                <label>Entidad Asignada *</label>
-                <select id="newUserEntidad" required><option value="">Seleccione una entidad</option></select>
-                <small>Este usuario solo podrá editar trabajadores de esta entidad</small>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" onclick="cerrarModalUsuario()">Cancelar</button>
-                <button type="submit" class="btn-save">Crear Usuario</button>
-            </div>
-        </form>
-    </div>
-</div>
+<div id="crearUsuarioModal" class="modal"><div class="modal-content"><h2>👤 Crear Usuario</h2><form id="crearUsuarioForm"><div class="form-group"><label>Email *</label><input type="email" id="newUsername" required></div><div class="form-group"><label>Contraseña *</label><input type="password" id="newPassword" required></div><div class="form-group"><label>Rol</label><select id="newUserRole" onchange="toggleEntidadField()"><option value="superadmin">Super Administrador</option><option value="admin_entidad">Administrador por Entidad</option><option value="consultor">Consultor</option></select></div><div class="form-group" id="entidadField" style="display:none;"><label>Entidad Asignada</label><select id="newUserEntidad"><option value="">Seleccione una entidad</option></select></div><div class="modal-buttons"><button type="button" class="btn-cancel" onclick="cerrarModalUsuario()">Cancelar</button><button type="submit" class="btn-save">Crear</button></div></form></div></div>
 
-<div id="crearEntidadModal" class="modal">
-    <div class="modal-content">
-        <h2>🏢 Nueva Entidad</h2>
-        <form id="crearEntidadForm">
-            <div class="form-group"><label>Nombre de la Entidad *</label><input type="text" id="newEntidadNombre" required placeholder="Ej: Empresa de Ómnibus Gibara"></div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" onclick="cerrarModalEntidad()">Cancelar</button>
-                <button type="submit" class="btn-save">Crear Entidad</button>
-            </div>
-        </form>
-    </div>
-</div>
+<div id="crearEntidadModal" class="modal"><div class="modal-content"><h2>🏢 Nueva Entidad</h2><form id="crearEntidadForm"><div class="form-group"><label>Nombre</label><input type="text" id="newEntidadNombre" required></div><div class="modal-buttons"><button type="button" class="btn-cancel" onclick="cerrarModalEntidad()">Cancelar</button><button type="submit" class="btn-save">Crear</button></div></form></div></div>
 
 <script>
-    // ==================== CONFIGURACIÓN DE SUPABASE ====================
+    // Configuración de Supabase
     const SUPABASE_URL = "https://jnmhbsvjnsvagcdfujok.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubWhic3ZqbnN2YWdjZGZ1am9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzQ5NjUsImV4cCI6MjA5MTE1MDk2NX0.n6cSbVkX0u23zshq49O0FPCwLKS3MP-o8J8EyroI75E";
     
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // Variables globales
     let trabajadores = [];
     let entidades = [];
     let usuarios = [];
-    let auditoria = [];
     let currentUser = null;
     let currentUserRol = null;
-    let currentUserEntidad = null;
     let currentUserEmail = null;
+    let currentUserEntidad = null;
     
-    // ==================== FUNCIONES AUXILIARES ====================
-    function calcularEdad(fechaNacimiento) {
-        const hoy = new Date();
-        const nac = new Date(fechaNacimiento);
-        let edad = hoy.getFullYear() - nac.getFullYear();
-        const m = hoy.getMonth() - nac.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
-        return edad;
-    }
-
-    function getMilitanciaLabel(militancia) {
-        const labels = { pcc: "PCC", ujc: "UJC", ninguna: "No militante" };
-        return labels[militancia] || "No militante";
-    }
-
-    function getNivelLabel(nivel) {
-        const labels = { primaria: "Primaria", secundaria: "Secundaria", preuniversitario: "Preuniversitario", tecnico_medio: "Técnico Medio", universitario: "Universitario", postgrado: "Postgrado" };
-        return labels[nivel] || nivel;
-    }
+    // Funciones auxiliares
+    function calcularEdad(fecha) { if(!fecha) return 0; const hoy = new Date(); const nac = new Date(fecha); let edad = hoy.getFullYear() - nac.getFullYear(); const m = hoy.getMonth() - nac.getMonth(); if(m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--; return edad; }
+    function getMilitanciaLabel(m) { const labels = { pcc:"PCC", ujc:"UJC", ninguna:"No militante" }; return labels[m] || "No militante"; }
+    function getNivelLabel(n) { const labels = { primaria:"Primaria", secundaria:"Secundaria", preuniversitario:"Preuniversitario", tecnico_medio:"Técnico Medio", universitario:"Universitario", postgrado:"Postgrado" }; return labels[n] || n; }
+    function getRolLabel(r) { const labels = { superadmin:"Super Administrador", admin_entidad:"Administrador por Entidad", consultor:"Consultor" }; return labels[r] || r; }
     
-    function getRolLabel(rol) {
-        const labels = { superadmin: "Super Administrador", admin_entidad: "Administrador por Entidad", consultor: "Consultor" };
-        return labels[rol] || rol;
-    }
+    function puedeEditarTrabajador(t) { if(currentUserRol === 'superadmin') return true; if(currentUserRol === 'admin_entidad' && currentUserEntidad === t.entidad) return true; return false; }
+    function getTrabajadoresVisibles() { if(currentUserRol === 'superadmin') return trabajadores; if(currentUserRol === 'admin_entidad') return trabajadores.filter(t => t.entidad === currentUserEntidad); return trabajadores; }
     
+    // Registrar auditoría
     async function registrarAuditoria(accion, detalles) {
-        if (!currentUser) return;
-        try {
-            await supabase.from('auditoria').insert([{
-                usuario: currentUserEmail,
-                rol: currentUserRol,
-                accion: accion,
-                detalles: detalles,
-                entidad_asignada: currentUserEntidad,
-                fecha: new Date().toISOString()
-            }]);
-        } catch (error) {
-            console.error('Error al registrar auditoría:', error);
-        }
+        if(!currentUser) return;
+        try { await supabase.from('auditoria').insert([{ usuario: currentUserEmail, rol: currentUserRol, accion: accion, detalles: detalles, entidad_asignada: currentUserEntidad, fecha: new Date().toISOString() }]); } catch(e) { console.error(e); }
     }
     
-    function puedeEditarTrabajador(trabajador) {
-        if (currentUserRol === 'superadmin') return true;
-        if (currentUserRol === 'admin_entidad' && currentUserEntidad === trabajador.entidad) return true;
-        return false;
-    }
-    
-    function getTrabajadoresVisibles() {
-        if (currentUserRol === 'superadmin') return trabajadores;
-        if (currentUserRol === 'admin_entidad') {
-            return trabajadores.filter(t => t.entidad === currentUserEntidad);
-        }
-        return trabajadores;
-    }
-    
-    // ==================== LOGIN ====================
+    // LOGIN
     async function doLogin() {
         const email = document.getElementById('loginUser').value.trim();
         const password = document.getElementById('loginPass').value;
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.innerHTML = '';
         
-        if (!email || !password) {
-            document.getElementById('loginError').innerText = 'Ingrese correo y contraseña';
-            return;
-        }
+        if(!email || !password) { errorDiv.innerHTML = '⚠️ Ingrese correo y contraseña'; return; }
         
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('loadingScreen').style.display = 'flex';
         
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-            
-            if (error) throw error;
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if(error) throw error;
             
             currentUser = data.user;
             currentUserEmail = data.user.email;
             
-            const { data: userData, error: userError } = await supabase
-                .from('usuarios')
-                .select('*')
-                .eq('id', currentUser.id)
-                .single();
-            
-            if (userError && userError.code !== 'PGRST116') {
-                console.error(userError);
-                currentUserRol = 'consultor';
-                currentUserEntidad = null;
-            } else if (userData) {
-                currentUserRol = userData.rol;
-                currentUserEntidad = userData.entidad_asignada;
-            } else {
-                currentUserRol = 'consultor';
-                currentUserEntidad = null;
-            }
+            const { data: userData, error: userError } = await supabase.from('usuarios').select('rol, entidad_asignada').eq('id', currentUser.id).single();
+            if(userError) { currentUserRol = 'consultor'; currentUserEntidad = null; }
+            else { currentUserRol = userData?.rol || 'consultor'; currentUserEntidad = userData?.entidad_asignada || null; }
             
             await registrarAuditoria('login', 'Inicio de sesión');
-            
-            await cargarTrabajadores();
-            await cargarEntidades();
-            await cargarUsuarios();
-            await cargarAuditoria();
-            
+            await cargarDatosIniciales();
             iniciarSesion();
             
-        } catch (error) {
-            console.error(error);
-            document.getElementById('loginError').innerText = 'Error: ' + error.message;
-            document.getElementById('loginScreen').style.display = 'flex';
+        } catch(error) {
             document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            let mensaje = error.message === 'Invalid login credentials' ? '❌ Usuario o contraseña incorrectos' : `❌ Error: ${error.message}`;
+            errorDiv.innerHTML = mensaje;
         }
+    }
+    
+    async function cargarDatosIniciales() {
+        const { data: t } = await supabase.from('trabajadores').select('*').order('nombre');
+        if(t) trabajadores = t;
+        const { data: e } = await supabase.from('entidades').select('*').order('nombre');
+        if(e) entidades = e.map(ent => ent.nombre);
+        const { data: u } = await supabase.from('usuarios').select('*');
+        if(u) usuarios = u;
     }
     
     function iniciarSesion() {
         document.getElementById('loadingScreen').style.display = 'none';
         document.getElementById('appContainer').style.display = 'flex';
-        
-        let rolTexto = '';
-        if (currentUserRol === 'superadmin') rolTexto = 'Super Administrador';
-        else if (currentUserRol === 'admin_entidad') rolTexto = `Administrador (${currentUserEntidad})`;
-        else rolTexto = 'Consultor';
-        
+        let rolTexto = currentUserRol === 'superadmin' ? 'Super Administrador' : (currentUserRol === 'admin_entidad' ? `Administrador (${currentUserEntidad})` : 'Consultor');
         document.getElementById('currentUser').innerHTML = `${currentUserEmail} (${rolTexto})`;
         
-        const isSuperAdmin = currentUserRol === 'superadmin';
-        const isAdminEntidad = currentUserRol === 'admin_entidad';
+        const isSuper = currentUserRol === 'superadmin';
+        const isAdmin = currentUserRol === 'admin_entidad';
+        document.getElementById('adminOnlyLink').style.display = (isSuper || isAdmin) ? 'block' : 'none';
+        document.getElementById('userManagementLink').style.display = isSuper ? 'block' : 'none';
+        document.getElementById('entidadesLink').style.display = isSuper ? 'block' : 'none';
+        document.getElementById('auditoriaLink').style.display = isSuper ? 'block' : 'none';
+        document.getElementById('addWorkerBtn').style.display = (isSuper || isAdmin) ? 'inline-block' : 'none';
         
-        document.getElementById('adminOnlyLink').style.display = (isSuperAdmin || isAdminEntidad) ? 'block' : 'none';
-        document.getElementById('userManagementLink').style.display = isSuperAdmin ? 'block' : 'none';
-        document.getElementById('entidadesLink').style.display = isSuperAdmin ? 'block' : 'none';
-        document.getElementById('auditoriaLink').style.display = isSuperAdmin ? 'block' : 'none';
-        document.getElementById('addWorkerBtn').style.display = (isSuperAdmin || isAdminEntidad) ? 'inline-block' : 'none';
-        
-        cargarSelectsEntidades();
+        cargarSelects();
         actualizarDashboard();
         actualizarListaTrabajadores();
+        if(isSuper) { cargarUsuarios(); cargarEntidades(); cargarAuditoria(); }
         showSection('dashboard');
     }
     
-    async function logout() {
-        await registrarAuditoria('logout', 'Cierre de sesión');
-        await supabase.auth.signOut();
-        currentUser = null;
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('appContainer').style.display = 'none';
-        document.getElementById('loginUser').value = '';
-        document.getElementById('loginPass').value = '';
-        document.getElementById('loginError').innerText = '';
-    }
+    async function logout() { await registrarAuditoria('logout', 'Cierre de sesión'); await supabase.auth.signOut(); location.reload(); }
     
-    // ==================== CRUD TRABAJADORES ====================
-    async function cargarTrabajadores() {
-        const { data, error } = await supabase.from('trabajadores').select('*').order('nombre');
-        if (error) { console.error(error); return; }
-        trabajadores = data;
+    // CRUD Trabajadores
+    async function registrarTrabajador(nuevo) {
+        if(currentUserRol !== 'superadmin' && currentUserRol !== 'admin_entidad') { alert('Sin permisos'); return false; }
+        const { error } = await supabase.from('trabajadores').insert([nuevo]);
+        if(error) { alert('Error: ' + error.message); return false; }
+        await registrarAuditoria('crear', `Registró: ${nuevo.nombre} (CI: ${nuevo.ci})`);
+        await cargarDatosIniciales();
         actualizarDashboard();
         actualizarListaTrabajadores();
-        cargarFiltrosEntidad();
-    }
-    
-    async function registrarTrabajador(nuevo) {
-        if (currentUserRol !== 'superadmin' && currentUserRol !== 'admin_entidad') {
-            alert('No tienes permisos para registrar trabajadores');
-            return false;
-        }
-        try {
-            const { error } = await supabase.from('trabajadores').insert([nuevo]);
-            if (error) throw error;
-            await registrarAuditoria('crear', `Registró trabajador: ${nuevo.nombre} (CI: ${nuevo.ci})`);
-            await cargarTrabajadores();
-            alert('Trabajador registrado correctamente');
-            return true;
-        } catch (error) {
-            alert('Error: ' + error.message);
-            return false;
-        }
+        alert('Registrado correctamente');
+        return true;
     }
     
     async function editarTrabajador(id, datos) {
-        try {
-            const { error } = await supabase.from('trabajadores').update(datos).eq('id', id);
-            if (error) throw error;
-            await registrarAuditoria('editar', `Editó trabajador ID: ${id}`);
-            await cargarTrabajadores();
-            alert('Datos actualizados correctamente');
-            return true;
-        } catch (error) {
-            alert('Error: ' + error.message);
-            return false;
-        }
+        const { error } = await supabase.from('trabajadores').update(datos).eq('id', id);
+        if(error) { alert('Error: ' + error.message); return false; }
+        await registrarAuditoria('editar', `Editó trabajador ID: ${id}`);
+        await cargarDatosIniciales();
+        actualizarDashboard();
+        actualizarListaTrabajadores();
+        alert('Actualizado correctamente');
+        return true;
     }
     
     async function eliminarTrabajador(id, ci, nombre) {
-        if (confirm(`¿Eliminar trabajador ${nombre} con CI ${ci}?`)) {
-            try {
-                const { error } = await supabase.from('trabajadores').delete().eq('id', id);
-                if (error) throw error;
-                await registrarAuditoria('eliminar', `Eliminó trabajador: ${nombre} (CI: ${ci})`);
-                await cargarTrabajadores();
-                alert('Trabajador eliminado');
-                return true;
-            } catch (error) {
-                alert('Error: ' + error.message);
-                return false;
-            }
-        }
-        return false;
+        if(!confirm(`¿Eliminar a ${nombre}?`)) return;
+        const { error } = await supabase.from('trabajadores').delete().eq('id', id);
+        if(error) { alert('Error: ' + error.message); return; }
+        await registrarAuditoria('eliminar', `Eliminó: ${nombre} (CI: ${ci})`);
+        await cargarDatosIniciales();
+        actualizarDashboard();
+        actualizarListaTrabajadores();
+        alert('Eliminado');
     }
     
-    // ==================== BÚSQUEDAS ====================
+    // Búsquedas
+    async function buscarPorCI() {
+        const ci = document.getElementById('ciSearchInput').value.trim();
+        const resultDiv = document.getElementById('searchResult');
+        if(!ci) { resultDiv.innerHTML = '<p style="color:red">Ingrese un CI</p>'; return; }
+        const trabajador = getTrabajadoresVisibles().find(t => t.ci === ci);
+        if(trabajador) {
+            await registrarAuditoria('busqueda_ci', `Buscó CI: ${ci} - Encontrado: ${trabajador.nombre}`);
+            resultDiv.innerHTML = generarFichaHTML(trabajador);
+        } else {
+            await registrarAuditoria('busqueda_ci', `Buscó CI: ${ci} - No encontrado`);
+            resultDiv.innerHTML = `<p style="color:red">❌ No encontrado: ${ci}</p>`;
+        }
+    }
+    
     function buscarAvanzada() {
         const nombre = document.getElementById('filterNombre')?.value.toLowerCase() || '';
         const ci = document.getElementById('filterCI')?.value || '';
         const entidad = document.getElementById('filterEntidad')?.value || '';
         const militancia = document.getElementById('filterMilitancia')?.value || '';
-        
-        const trabajadoresVisibles = getTrabajadoresVisibles();
-        
-        let filtrosActivos = [];
-        if (nombre) filtrosActivos.push(`nombre: "${nombre}"`);
-        if (ci) filtrosActivos.push(`CI: "${ci}"`);
-        if (entidad) filtrosActivos.push(`entidad: "${entidad}"`);
-        if (militancia) filtrosActivos.push(`militancia: "${militancia}"`);
-        
-        if (filtrosActivos.length > 0) {
-            let tipoBusqueda = 'busqueda_avanzada';
-            if (nombre && !ci && !entidad && !militancia) tipoBusqueda = 'busqueda_nombre';
-            else if (ci && !nombre && !entidad && !militancia) tipoBusqueda = 'busqueda_ci';
-            else if (militancia && !nombre && !ci && !entidad) tipoBusqueda = 'busqueda_militancia';
-            else if (entidad && !nombre && !ci && !militancia) tipoBusqueda = 'busqueda_entidad';
-            
-            const resultados = trabajadoresVisibles.filter(t => {
-                if (nombre && !t.nombre.toLowerCase().includes(nombre)) return false;
-                if (ci && !t.ci.includes(ci)) return false;
-                if (entidad && t.entidad !== entidad) return false;
-                if (militancia && t.militancia !== militancia) return false;
-                return true;
-            });
-            
-            registrarAuditoria(tipoBusqueda, `Filtros: ${filtrosActivos.join(', ')} - Resultados: ${resultados.length}`);
-        }
-        
-        const filtrados = trabajadoresVisibles.filter(t => {
-            if (nombre && !t.nombre.toLowerCase().includes(nombre)) return false;
-            if (ci && !t.ci.includes(ci)) return false;
-            if (entidad && t.entidad !== entidad) return false;
-            if (militancia && t.militancia !== militancia) return false;
+        const filtrados = getTrabajadoresVisibles().filter(t => {
+            if(nombre && !t.nombre.toLowerCase().includes(nombre)) return false;
+            if(ci && !t.ci.includes(ci)) return false;
+            if(entidad && t.entidad !== entidad) return false;
+            if(militancia && t.militancia !== militancia) return false;
             return true;
         });
-        
         const container = document.getElementById('filterResults');
-        if (container) {
-            if (filtrados.length === 0) {
-                container.innerHTML = '<p>No se encontraron resultados</p>';
-            } else {
-                let html = '<div class="data-table"><table style="width:100%"><thead><tr><th>CI</th><th>Nombre</th><th>Teléfono</th><th>Entidad</th><th>Cargo</th><th>Edad</th><th>Militancia</th></tr></thead><tbody>';
-                filtrados.forEach(t => {
-                    html += `<tr onclick='verFichaCompleta(${JSON.stringify(t).replace(/'/g, "\\'")})' style="cursor:pointer">
-                        <td>${t.ci}</td><td>${t.nombre}</td><td>${t.telefono || 'N/A'}</td>
-                        <td>${t.entidad}</td><td>${t.cargo}</td>
-                        <td>${calcularEdad(t.fecha_nacimiento)}</td>
-                        <td><span class="badge badge-${t.militancia === 'pcc' ? 'pcc' : (t.militancia === 'ujc' ? 'ujc' : 'none')}">${getMilitanciaLabel(t.militancia)}</span></td>
-                    </tr>`;
-                });
+        if(container) {
+            if(filtrados.length === 0) container.innerHTML = '<p>No hay resultados</p>';
+            else {
+                let html = '<div class="data-table"><table><thead><tr><th>CI</th><th>Nombre</th><th>Teléfono</th><th>Entidad</th><th>Cargo</th><th>Edad</th><th>Militancia</th></tr></thead><tbody>';
+                filtrados.forEach(t => { html += `<tr onclick='verFichaCompleta(${JSON.stringify(t).replace(/'/g, "\\'")})'><td>${t.ci}</td><td>${t.nombre}</td><td>${t.telefono || 'N/A'}</td><td>${t.entidad}</td><td>${t.cargo}</td><td>${calcularEdad(t.fecha_nacimiento)}</td><td><span class="badge badge-${t.militancia === 'pcc' ? 'pcc' : (t.militancia === 'ujc' ? 'ujc' : 'none')}">${getMilitanciaLabel(t.militancia)}</span></td></tr>`; });
                 html += '</tbody></table></div>';
                 container.innerHTML = html;
             }
         }
         actualizarListaTrabajadores(filtrados);
+        if(nombre || ci || entidad || militancia) registrarAuditoria('busqueda_avanzada', `Filtros aplicados`);
     }
     
-    async function buscarPorCI() {
-        const ci = document.getElementById('ciSearchInput').value.trim();
-        const resultDiv = document.getElementById('searchResult');
-        if (!ci) {
-            resultDiv.innerHTML = '<p style="color:red">Ingrese un Carnet de Identidad</p>';
-            return;
-        }
-        const trabajador = getTrabajadoresVisibles().find(t => t.ci === ci);
-        if (trabajador) {
-            await registrarAuditoria('busqueda_ci', `Buscó CI: ${ci} - Resultado: Encontrado - ${trabajador.nombre}`);
-            resultDiv.innerHTML = generarFichaHTML(trabajador);
-        } else {
-            await registrarAuditoria('busqueda_ci', `Buscó CI: ${ci} - Resultado: No encontrado`);
-            resultDiv.innerHTML = `<p style="color:red">❌ No se encontró trabajador con CI: ${ci}</p>`;
-        }
-    }
-    
-    function verFichaCompleta(trabajador) {
-        const resultDiv = document.getElementById('searchResult');
-        if (resultDiv) {
-            showSection('search');
-            document.getElementById('ciSearchInput').value = trabajador.ci;
-            resultDiv.innerHTML = generarFichaHTML(trabajador);
-        }
+    function verFichaCompleta(t) {
+        const div = document.getElementById('searchResult');
+        if(div) { showSection('search'); document.getElementById('ciSearchInput').value = t.ci; div.innerHTML = generarFichaHTML(t); }
     }
     
     function generarFichaHTML(t) {
         const edad = calcularEdad(t.fecha_nacimiento);
         const puedeEditar = puedeEditarTrabajador(t);
-        
-        return `
-            <div class="worker-card">
-                <div class="worker-header">
-                    <div class="worker-name">${t.nombre}</div>
-                    <div class="worker-ci">CI: ${t.ci}</div>
-                </div>
-                <div class="worker-info-grid">
-                    <div class="info-section">
-                        <h4>📋 Datos Personales</h4>
-                        <div class="info-row"><span class="info-label">Edad:</span><span>${edad} años ${edad < 35 ? '<span class="badge badge-young">Menor de 35</span>' : ''}</span></div>
-                        <div class="info-row"><span class="info-label">Sexo:</span><span>${t.sexo === 'M' ? 'Masculino' : 'Femenino'}</span></div>
-                        <div class="info-row"><span class="info-label">Teléfono:</span><span>${t.telefono || 'N/A'}</span></div>
-                        <div class="info-row"><span class="info-label">Dirección:</span><span>${t.direccion || 'N/A'}</span></div>
-                        <div class="info-row"><span class="info-label">Municipio:</span><span>${t.municipio || 'N/A'}</span></div>
-                    </div>
-                    <div class="info-section">
-                        <h4>🏢 Datos Laborales</h4>
-                        <div class="info-row"><span class="info-label">Entidad:</span><span>${t.entidad}</span></div>
-                        <div class="info-row"><span class="info-label">Cargo:</span><span>${t.cargo}</span></div>
-                        <div class="info-row"><span class="info-label">Licencia:</span><span>${t.licencia || 'N/A'}</span></div>
-                        <div class="info-row"><span class="info-label">Vehículo:</span><span>${t.vehiculo || 'N/A'}</span></div>
-                    </div>
-                    <div class="info-section">
-                        <h4>📚 Escolaridad y Militancia</h4>
-                        <div class="info-row"><span class="info-label">Nivel Escolar:</span><span>${getNivelLabel(t.nivel_escolar)}</span></div>
-                        <div class="info-row"><span class="info-label">Militancia:</span><span><span class="badge badge-${t.militancia === 'pcc' ? 'pcc' : (t.militancia === 'ujc' ? 'ujc' : 'none')}">${getMilitanciaLabel(t.militancia)}</span></span></div>
-                    </div>
-                </div>
-                ${puedeEditar ? `
-                <div class="action-buttons">
-                    <button class="btn-edit" onclick="event.stopPropagation(); abrirEditarTrabajador('${t.id}')">✏️ Editar</button>
-                    <button class="btn-delete" onclick="event.stopPropagation(); eliminarTrabajador('${t.id}', '${t.ci}', '${t.nombre}')">🗑️ Eliminar</button>
-                </div>
-                ` : ''}
-            </div>
-        `;
+        return `<div class="worker-card"><div class="worker-header"><div class="worker-name">${t.nombre}</div><div class="worker-ci">CI: ${t.ci}</div></div><div class="worker-info-grid"><div class="info-section"><h4>📋 Datos Personales</h4><div class="info-row"><span>Edad:</span><span>${edad} años ${edad<35?'<span class="badge badge-young">Menor 35</span>':''}</span></div><div class="info-row"><span>Sexo:</span><span>${t.sexo==='M'?'Masculino':'Femenino'}</span></div><div class="info-row"><span>Teléfono:</span><span>${t.telefono||'N/A'}</span></div><div class="info-row"><span>Dirección:</span><span>${t.direccion||'N/A'}</span></div><div class="info-row"><span>Municipio:</span><span>${t.municipio||'N/A'}</span></div></div><div class="info-section"><h4>🏢 Datos Laborales</h4><div class="info-row"><span>Entidad:</span><span>${t.entidad}</span></div><div class="info-row"><span>Cargo:</span><span>${t.cargo}</span></div><div class="info-row"><span>Licencia:</span><span>${t.licencia||'N/A'}</span></div><div class="info-row"><span>Vehículo:</span><span>${t.vehiculo||'N/A'}</span></div></div><div class="info-section"><h4>📚 Escolaridad</h4><div class="info-row"><span>Nivel:</span><span>${getNivelLabel(t.nivel_escolar)}</span></div><div class="info-row"><span>Militancia:</span><span><span class="badge badge-${t.militancia==='pcc'?'pcc':(t.militancia==='ujc'?'ujc':'none')}">${getMilitanciaLabel(t.militancia)}</span></span></div></div></div>${puedeEditar?`<div class="action-buttons"><button class="btn-edit" onclick="abrirEditarTrabajador('${t.id}')">✏️ Editar</button><button class="btn-delete" onclick="eliminarTrabajador('${t.id}','${t.ci}','${t.nombre}')">🗑️ Eliminar</button></div>`:''}</div>`;
     }
     
-    // ==================== GESTIÓN DE ENTIDADES ====================
-    async function cargarEntidades() {
-        const { data, error } = await supabase.from('entidades').select('*').order('nombre');
-        if (error) { console.error(error); return; }
-        entidades = data.map(e => e.nombre);
-        cargarSelectsEntidades();
-        if (currentUserRol === 'superadmin') {
-            const tbody = document.getElementById('entidadesTableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                entidades.forEach(ent => {
-                    const row = tbody.insertRow();
-                    row.insertCell(0).innerHTML = ent;
-                    row.insertCell(1).innerHTML = new Date().toLocaleDateString();
-                    row.insertCell(2).innerHTML = `<button class="btn-delete" style="padding:4px 12px" onclick="eliminarEntidad('${ent}')">Eliminar</button>`;
-                });
-            }
-        }
-    }
-    
-    async function agregarEntidad(nombre) {
-        if (entidades.includes(nombre)) {
-            alert('La entidad ya existe');
-            return false;
-        }
-        try {
-            const { error } = await supabase.from('entidades').insert([{ nombre: nombre }]);
-            if (error) throw error;
-            await registrarAuditoria('entidad', `Agregó nueva entidad: ${nombre}`);
-            await cargarEntidades();
-            alert(`Entidad "${nombre}" agregada correctamente`);
-            return true;
-        } catch (error) {
-            alert('Error: ' + error.message);
-            return false;
-        }
-    }
-    
-    async function eliminarEntidad(nombre) {
-        const trabajadoresEnEntidad = trabajadores.filter(t => t.entidad === nombre);
-        if (trabajadoresEnEntidad.length > 0) {
-            alert(`No se puede eliminar la entidad "${nombre}" porque tiene ${trabajadoresEnEntidad.length} trabajadores asociados.`);
-            return false;
-        }
-        if (confirm(`¿Eliminar la entidad "${nombre}"?`)) {
-            try {
-                const { error } = await supabase.from('entidades').delete().eq('nombre', nombre);
-                if (error) throw error;
-                await registrarAuditoria('entidad', `Eliminó entidad: ${nombre}`);
-                await cargarEntidades();
-                alert('Entidad eliminada');
-                return true;
-            } catch (error) {
-                alert('Error: ' + error.message);
-                return false;
-            }
-        }
-        return false;
-    }
-    
-    function cargarSelectsEntidades() {
-        const selects = ['reg_entidad', 'edit_entidad', 'newUserEntidad', 'filterEntidad'];
-        const opciones = '<option value="">Seleccione una entidad</option>' + entidades.map(e => `<option value="${e}">${e}</option>`).join('');
-        
-        selects.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (select) {
-                const valorActual = select.value;
-                select.innerHTML = opciones;
-                if (valorActual && entidades.includes(valorActual)) {
-                    select.value = valorActual;
-                }
-            }
-        });
-        
-        const auditFilterUsuario = document.getElementById('auditFilterUsuario');
-        if (auditFilterUsuario && usuarios.length > 0) {
-            auditFilterUsuario.innerHTML = '<option value="">Todos los usuarios</option>' + 
-                [...new Set(usuarios.map(u => u.email))].map(u => `<option value="${u}">${u}</option>`).join('');
-        }
-    }
-    
-    // ==================== GESTIÓN DE USUARIOS ====================
-    async function cargarUsuarios() {
-        if (currentUserRol !== 'superadmin') return;
-        const { data, error } = await supabase.from('usuarios').select('*');
-        if (error) { console.error(error); return; }
-        usuarios = data;
-        const tbody = document.getElementById('usuariosTableBody');
-        if (tbody) {
-            tbody.innerHTML = '';
-            usuarios.forEach(user => {
-                if (user.id === currentUser?.id) return;
-                const row = tbody.insertRow();
-                row.insertCell(0).innerHTML = user.email;
-                row.insertCell(1).innerHTML = `<span class="badge ${user.rol === 'superadmin' ? 'badge-superadmin' : (user.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(user.rol)}</span>`;
-                row.insertCell(2).innerHTML = user.entidad_asignada || 'Todas';
-                row.insertCell(3).innerHTML = new Date(user.created_at).toLocaleDateString();
-                row.insertCell(4).innerHTML = `<button class="btn-delete" style="padding:4px 12px" onclick="eliminarUsuario('${user.id}', '${user.email}')">Eliminar</button>`;
-            });
-        }
-        cargarSelectsEntidades();
-    }
-    
-    async function crearUsuario(email, password, rol, entidadAsignada = null) {
-        if (currentUserRol !== 'superadmin') {
-            alert('Solo el Super Administrador puede crear usuarios');
-            return false;
-        }
-        if (usuarios.find(u => u.email === email)) {
-            alert('El correo ya está registrado');
-            return false;
-        }
-        if (password.length < 6) {
-            alert('La contraseña debe tener al menos 6 caracteres');
-            return false;
-        }
-        try {
-            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-                email: email,
-                password: password,
-                email_confirm: true
-            });
-            if (authError) throw authError;
-            
-            const { error: dbError } = await supabase.from('usuarios').insert([{
-                id: authData.user.id,
-                email: email,
-                rol: rol,
-                entidad_asignada: entidadAsignada
-            }]);
-            if (dbError) throw dbError;
-            
-            await registrarAuditoria('usuario', `Creó usuario: ${email} con rol ${rol}`);
-            await cargarUsuarios();
-            alert(`Usuario ${email} creado correctamente`);
-            return true;
-        } catch (error) {
-            alert('Error: ' + error.message);
-            return false;
-        }
-    }
-    
-    async function eliminarUsuario(id, email) {
-        if (currentUserRol !== 'superadmin') return;
-        if (currentUser?.id === id) {
-            alert('No puedes eliminar tu propio usuario');
-            return;
-        }
-        if (confirm(`¿Eliminar usuario ${email}?`)) {
-            try {
-                await supabase.auth.admin.deleteUser(id);
-                await supabase.from('usuarios').delete().eq('id', id);
-                await registrarAuditoria('usuario', `Eliminó usuario: ${email}`);
-                await cargarUsuarios();
-                alert('Usuario eliminado');
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        }
-    }
-    
-    function toggleEntidadField() {
-        const rol = document.getElementById('newUserRole').value;
-        const entidadField = document.getElementById('entidadField');
-        entidadField.style.display = rol === 'admin_entidad' ? 'block' : 'none';
-    }
-    
-    // ==================== AUDITORÍA ====================
-    async function cargarAuditoria() {
-        if (currentUserRol !== 'superadmin') return;
-        const filtroUsuario = document.getElementById('auditFilterUsuario').value;
-        const filtroAccion = document.getElementById('auditFilterAccion').value;
-        
-        let query = supabase.from('auditoria').select('*').order('fecha', { ascending: false });
-        if (filtroUsuario) query = query.eq('usuario', filtroUsuario);
-        if (filtroAccion) query = query.eq('accion', filtroAccion);
-        
-        const { data, error } = await query;
-        if (error) { console.error(error); return; }
-        
-        const tbody = document.getElementById('auditoriaTableBody');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-        
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No hay registros de auditoría</td></tr>';
-            return;
-        }
-        
-        data.forEach(reg => {
-            const row = tbody.insertRow();
-            row.insertCell(0).innerHTML = new Date(reg.fecha).toLocaleString();
-            row.insertCell(1).innerHTML = reg.usuario;
-            row.insertCell(2).innerHTML = `<span class="badge ${reg.rol === 'superadmin' ? 'badge-superadmin' : (reg.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(reg.rol)}</span>`;
-            
-            let accionIcono = '', accionTexto = '';
-            if (reg.accion === 'busqueda_ci') { accionIcono = '🔍 '; accionTexto = 'Búsqueda por CI'; }
-            else if (reg.accion === 'busqueda_nombre') { accionIcono = '🔎 '; accionTexto = 'Búsqueda por Nombre'; }
-            else if (reg.accion === 'busqueda_militancia') { accionIcono = '📊 '; accionTexto = 'Búsqueda por Militancia'; }
-            else if (reg.accion === 'busqueda_entidad') { accionIcono = '🏢 '; accionTexto = 'Búsqueda por Entidad'; }
-            else if (reg.accion === 'busqueda_avanzada') { accionIcono = '🔬 '; accionTexto = 'Búsqueda Avanzada'; }
-            else if (reg.accion === 'crear') { accionIcono = '➕ '; accionTexto = 'Creación'; }
-            else if (reg.accion === 'editar') { accionIcono = '✏️ '; accionTexto = 'Edición'; }
-            else if (reg.accion === 'eliminar') { accionIcono = '🗑️ '; accionTexto = 'Eliminación'; }
-            else if (reg.accion === 'login') { accionIcono = '🔐 '; accionTexto = 'Inicio de Sesión'; }
-            else if (reg.accion === 'logout') { accionIcono = '🚪 '; accionTexto = 'Cierre de Sesión'; }
-            else if (reg.accion === 'usuario') { accionIcono = '👥 '; accionTexto = 'Gestión de Usuarios'; }
-            else if (reg.accion === 'entidad') { accionIcono = '🏢 '; accionTexto = 'Gestión de Entidades'; }
-            else { accionIcono = '📌 '; accionTexto = reg.accion; }
-            
-            row.insertCell(3).innerHTML = accionIcono + accionTexto;
-            row.insertCell(4).innerHTML = reg.detalles;
-            row.insertCell(5).innerHTML = `<button class="btn-delete" style="padding:4px 8px" onclick="eliminarRegistroAuditoria(${reg.id})">Eliminar</button>`;
-        });
-    }
-    
-    function limpiarFiltrosAuditoria() {
-        document.getElementById('auditFilterUsuario').value = '';
-        document.getElementById('auditFilterAccion').value = '';
-        cargarAuditoria();
-    }
-    
-    async function eliminarRegistroAuditoria(id) {
-        if (confirm('¿Eliminar este registro de auditoría?')) {
-            await supabase.from('auditoria').delete().eq('id', id);
-            cargarAuditoria();
-            alert('Registro eliminado');
-        }
-    }
-    
-    async function eliminarTodasAuditoria() {
-        if (confirm('⚠️ ¿Eliminar TODOS los registros de auditoría? Esta acción no se puede deshacer.')) {
-            await supabase.from('auditoria').delete().neq('id', 0);
-            cargarAuditoria();
-            alert('Todos los registros de auditoría han sido eliminados');
-        }
-    }
-    
-    // ==================== NAVEGACIÓN Y UI ====================
-    function showSection(section) {
-        const sections = ['dashboardSection', 'searchSection', 'workersListSection', 'reportsSection', 'registerSection', 'userManagementSection', 'entidadesSection', 'auditoriaSection'];
-        sections.forEach(s => { const el = document.getElementById(s); if (el) el.style.display = 'none'; });
-        
-        const el = document.getElementById(section);
-        if (el) el.style.display = 'block';
-        if (section === 'reports') actualizarReportes();
-        if (section === 'auditoria') cargarAuditoria();
+    // UI
+    function showSection(s) {
+        ['dashboardSection','searchSection','workersListSection','reportsSection','registerSection','userManagementSection','entidadesSection','auditoriaSection'].forEach(sec => { const el = document.getElementById(sec); if(el) el.style.display = 'none'; });
+        const el = document.getElementById(s); if(el) el.style.display = 'block';
+        if(s === 'reports') actualizarReportes();
+        if(s === 'auditoria' && currentUserRol === 'superadmin') cargarAuditoria();
     }
     
     function actualizarDashboard() {
-        const trabajadoresVisibles = getTrabajadoresVisibles();
-        const total = trabajadoresVisibles.length;
-        const menores35 = trabajadoresVisibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
-        const militantesPCC = trabajadoresVisibles.filter(t => t.militancia === 'pcc').length;
-        const militantesUJC = trabajadoresVisibles.filter(t => t.militancia === 'ujc').length;
-        const universitarios = trabajadoresVisibles.filter(t => t.nivel_escolar === 'universitario' || t.nivel_escolar === 'postgrado').length;
-        
-        const dashboardCards = document.getElementById('dashboardCards');
-        if (dashboardCards) {
-            dashboardCards.innerHTML = `
-                <div class="card"><h3>Total Trabajadores</h3><div class="number">${total}</div></div>
-                <div class="card"><h3>Menores de 35 años</h3><div class="number">${menores35}</div></div>
-                <div class="card"><h3>Militantes PCC</h3><div class="number">${militantesPCC}</div></div>
-                <div class="card"><h3>Militantes UJC</h3><div class="number">${militantesUJC}</div></div>
-                <div class="card"><h3>Universitarios</h3><div class="number">${universitarios}</div></div>
-            `;
-        }
-        
-        const entidadesStats = {};
-        trabajadoresVisibles.forEach(t => { entidadesStats[t.entidad] = (entidadesStats[t.entidad] || 0) + 1; });
-        let entidadHtml = '';
-        for (const [ent, count] of Object.entries(entidadesStats)) {
-            entidadHtml += `<div class="stat-card"><strong>${ent}</strong><br>${count} trabajadores</div>`;
-        }
-        const entidadStats = document.getElementById('entidadStats');
-        if (entidadStats) entidadStats.innerHTML = entidadHtml || '<p>No hay datos</p>';
+        const visibles = getTrabajadoresVisibles();
+        const total = visibles.length;
+        const menores35 = visibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
+        const pcc = visibles.filter(t => t.militancia === 'pcc').length;
+        const ujc = visibles.filter(t => t.militancia === 'ujc').length;
+        const uni = visibles.filter(t => t.nivel_escolar === 'universitario' || t.nivel_escolar === 'postgrado').length;
+        document.getElementById('dashboardCards').innerHTML = `<div class="card"><h3>Total</h3><div class="number">${total}</div></div><div class="card"><h3>Menores 35</h3><div class="number">${menores35}</div></div><div class="card"><h3>PCC</h3><div class="number">${pcc}</div></div><div class="card"><h3>UJC</h3><div class="number">${ujc}</div></div><div class="card"><h3>Universitarios</h3><div class="number">${uni}</div></div>`;
+        const stats = {}; visibles.forEach(t => { stats[t.entidad] = (stats[t.entidad] || 0) + 1; });
+        let html = ''; for(const [e,c] of Object.entries(stats)) html += `<div class="stat-card"><strong>${e}</strong><br>${c} trabajadores</div>`;
+        document.getElementById('entidadStats').innerHTML = html || '<p>Sin datos</p>';
     }
     
     function actualizarListaTrabajadores(filtrados = null) {
         const lista = filtrados || getTrabajadoresVisibles();
         const tbody = document.getElementById('workersTableBody');
-        if (!tbody) return;
+        if(!tbody) return;
         tbody.innerHTML = '';
-        lista.forEach(t => {
-            const row = tbody.insertRow();
-            row.style.cursor = 'pointer';
-            row.onclick = () => verFichaCompleta(t);
-            row.insertCell(0).innerHTML = t.ci;
-            row.insertCell(1).innerHTML = t.nombre;
-            row.insertCell(2).innerHTML = t.telefono || 'N/A';
-            row.insertCell(3).innerHTML = t.entidad;
-            row.insertCell(4).innerHTML = t.cargo;
-            row.insertCell(5).innerHTML = calcularEdad(t.fecha_nacimiento);
-            row.insertCell(6).innerHTML = `<span class="badge badge-${t.militancia === 'pcc' ? 'pcc' : (t.militancia === 'ujc' ? 'ujc' : 'none')}">${getMilitanciaLabel(t.militancia)}</span>`;
-        });
-    }
-    
-    function cargarFiltrosEntidad() {
-        const entidadesUnicas = [...new Set(getTrabajadoresVisibles().map(t => t.entidad))];
-        const select = document.getElementById('filterEntidad');
-        if (select) {
-            select.innerHTML = '<option value="">Todas las entidades</option>' + entidadesUnicas.map(e => `<option value="${e}">${e}</option>`).join('');
-        }
+        lista.forEach(t => { const row = tbody.insertRow(); row.style.cursor = 'pointer'; row.onclick = () => verFichaCompleta(t); row.insertCell(0).innerHTML = t.ci; row.insertCell(1).innerHTML = t.nombre; row.insertCell(2).innerHTML = t.telefono || 'N/A'; row.insertCell(3).innerHTML = t.entidad; row.insertCell(4).innerHTML = t.cargo; row.insertCell(5).innerHTML = calcularEdad(t.fecha_nacimiento); row.insertCell(6).innerHTML = `<span class="badge badge-${t.militancia==='pcc'?'pcc':(t.militancia==='ujc'?'ujc':'none')}">${getMilitanciaLabel(t.militancia)}</span>`; });
     }
     
     function actualizarReportes() {
-        const trabajadoresVisibles = getTrabajadoresVisibles();
-        const total = trabajadoresVisibles.length;
-        if (total === 0) return;
-        
-        const menores35 = trabajadoresVisibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
-        const militantesPCC = trabajadoresVisibles.filter(t => t.militancia === 'pcc').length;
-        const militantesUJC = trabajadoresVisibles.filter(t => t.militancia === 'ujc').length;
-        
-        const reportCards = document.getElementById('reportCards');
-        if (reportCards) {
-            reportCards.innerHTML = `
-                <div class="card"><h3>Total</h3><div class="number">${total}</div></div>
-                <div class="card"><h3>Menores 35</h3><div class="number">${menores35} (${Math.round(menores35/total*100)}%)</div></div>
-                <div class="card"><h3>PCC</h3><div class="number">${militantesPCC} (${Math.round(militantesPCC/total*100)}%)</div></div>
-                <div class="card"><h3>UJC</h3><div class="number">${militantesUJC} (${Math.round(militantesUJC/total*100)}%)</div></div>
-            `;
-        }
-        
-        const escolaridades = { primaria:0, secundaria:0, preuniversitario:0, tecnico_medio:0, universitario:0, postgrado:0 };
-        trabajadoresVisibles.forEach(t => { if(escolaridades[t.nivel_escolar]!==undefined) escolaridades[t.nivel_escolar]++; });
-        let escolarHtml = '<div class="stats-grid">';
-        for (const [nivel, count] of Object.entries(escolaridades)) {
-            if (count > 0) {
-                escolarHtml += `<div class="stat-card"><strong>${getNivelLabel(nivel)}</strong><br>${count} (${Math.round(count/total*100)}%)</div>`;
-            }
-        }
-        escolarHtml += '</div>';
-        const escolaridadStats = document.getElementById('escolaridadStats');
-        if (escolaridadStats) escolaridadStats.innerHTML = escolarHtml;
-        
-        const militancias = { pcc:0, ujc:0, ninguna:0 };
-        trabajadoresVisibles.forEach(t => { militancias[t.militancia]++; });
-        let militHtml = '<div class="stats-grid">';
-        militHtml += `<div class="stat-card"><strong>PCC</strong><br>${militancias.pcc} (${Math.round(militancias.pcc/total*100)}%)</div>`;
-        militHtml += `<div class="stat-card"><strong>UJC</strong><br>${militancias.ujc} (${Math.round(militancias.ujc/total*100)}%)</div>`;
-        militHtml += `<div class="stat-card"><strong>No militantes</strong><br>${militancias.ninguna} (${Math.round(militancias.ninguna/total*100)}%)</div>`;
-        militHtml += '</div>';
-        const militanciaStats = document.getElementById('militanciaStats');
-        if (militanciaStats) militanciaStats.innerHTML = militHtml;
+        const visibles = getTrabajadoresVisibles();
+        const total = visibles.length;
+        if(total === 0) return;
+        const menores35 = visibles.filter(t => calcularEdad(t.fecha_nacimiento) < 35).length;
+        const pcc = visibles.filter(t => t.militancia === 'pcc').length;
+        const ujc = visibles.filter(t => t.militancia === 'ujc').length;
+        document.getElementById('reportCards').innerHTML = `<div class="card"><h3>Total</h3><div class="number">${total}</div></div><div class="card"><h3>Menores 35</h3><div class="number">${menores35} (${Math.round(menores35/total*100)}%)</div></div><div class="card"><h3>PCC</h3><div class="number">${pcc} (${Math.round(pcc/total*100)}%)</div></div><div class="card"><h3>UJC</h3><div class="number">${ujc} (${Math.round(ujc/total*100)}%)</div></div>`;
+        const esc = { primaria:0, secundaria:0, preuniversitario:0, tecnico_medio:0, universitario:0, postgrado:0 };
+        visibles.forEach(t => { if(esc[t.nivel_escolar]!==undefined) esc[t.nivel_escolar]++; });
+        let escHtml = '<div class="stats-grid">';
+        for(const [n,c] of Object.entries(esc)) if(c>0) escHtml += `<div class="stat-card"><strong>${getNivelLabel(n)}</strong><br>${c} (${Math.round(c/total*100)}%)</div>`;
+        escHtml += '</div>';
+        document.getElementById('escolaridadStats').innerHTML = escHtml;
+        const mil = { pcc:0, ujc:0, ninguna:0 };
+        visibles.forEach(t => { mil[t.militancia]++; });
+        let milHtml = '<div class="stats-grid">';
+        milHtml += `<div class="stat-card"><strong>PCC</strong><br>${mil.pcc} (${Math.round(mil.pcc/total*100)}%)</div>`;
+        milHtml += `<div class="stat-card"><strong>UJC</strong><br>${mil.ujc} (${Math.round(mil.ujc/total*100)}%)</div>`;
+        milHtml += `<div class="stat-card"><strong>No militantes</strong><br>${mil.ninguna} (${Math.round(mil.ninguna/total*100)}%)</div></div>`;
+        document.getElementById('militanciaStats').innerHTML = milHtml;
     }
+    
+    // Gestión de entidades (Super Admin)
+    async function cargarEntidades() {
+        if(currentUserRol !== 'superadmin') return;
+        const tbody = document.getElementById('entidadesTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        entidades.forEach(ent => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = ent; row.insertCell(1).innerHTML = new Date().toLocaleDateString(); row.insertCell(2).innerHTML = `<button class="btn-delete" onclick="eliminarEntidad('${ent}')">Eliminar</button>`; });
+    }
+    
+    async function agregarEntidad(nombre) {
+        if(entidades.includes(nombre)) { alert('Ya existe'); return false; }
+        const { error } = await supabase.from('entidades').insert([{ nombre }]);
+        if(error) { alert('Error: ' + error.message); return false; }
+        await registrarAuditoria('entidad', `Agregó: ${nombre}`);
+        await cargarDatosIniciales();
+        cargarEntidades();
+        cargarSelects();
+        alert(`Entidad "${nombre}" agregada`);
+        return true;
+    }
+    
+    async function eliminarEntidad(nombre) {
+        if(trabajadores.some(t => t.entidad === nombre)) { alert(`No se puede eliminar "${nombre}" porque tiene trabajadores asociados`); return; }
+        if(!confirm(`¿Eliminar "${nombre}"?`)) return;
+        const { error } = await supabase.from('entidades').delete().eq('nombre', nombre);
+        if(error) { alert('Error: ' + error.message); return; }
+        await registrarAuditoria('entidad', `Eliminó: ${nombre}`);
+        await cargarDatosIniciales();
+        cargarEntidades();
+        cargarSelects();
+        alert('Entidad eliminada');
+    }
+    
+    // Gestión de usuarios (Super Admin)
+    async function cargarUsuarios() {
+        if(currentUserRol !== 'superadmin') return;
+        const tbody = document.getElementById('usuariosTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        usuarios.forEach(user => { if(user.id === currentUser?.id) return;
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = user.email;
+            row.insertCell(1).innerHTML = `<span class="badge ${user.rol === 'superadmin' ? 'badge-superadmin' : (user.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(user.rol)}</span>`;
+            row.insertCell(2).innerHTML = user.entidad_asignada || 'Todas';
+            row.insertCell(3).innerHTML = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
+            row.insertCell(4).innerHTML = `<button class="btn-delete" onclick="eliminarUsuario('${user.id}','${user.email}')">Eliminar</button>`;
+        });
+    }
+    
+    async function crearUsuario(email, password, rol, entidadAsignada = null) {
+        if(currentUserRol !== 'superadmin') { alert('Sin permisos'); return false; }
+        if(usuarios.some(u => u.email === email)) { alert('El email ya existe'); return false; }
+        if(password.length < 6) { alert('La contraseña debe tener al menos 6 caracteres'); return false; }
+        try {
+            const { data: authData, error: authError } = await supabase.auth.admin.createUser({ email, password, email_confirm: true });
+            if(authError) throw authError;
+            const { error: dbError } = await supabase.from('usuarios').insert([{ id: authData.user.id, email, rol, entidad_asignada }]);
+            if(dbError) throw dbError;
+            await registrarAuditoria('usuario', `Creó usuario: ${email} (${rol})`);
+            await cargarDatosIniciales();
+            cargarUsuarios();
+            cargarSelects();
+            alert(`Usuario ${email} creado`);
+            return true;
+        } catch(e) { alert('Error: ' + e.message); return false; }
+    }
+    
+    async function eliminarUsuario(id, email) {
+        if(currentUser?.id === id) { alert('No puedes eliminarte'); return; }
+        if(!confirm(`¿Eliminar ${email}?`)) return;
+        try {
+            await supabase.auth.admin.deleteUser(id);
+            await supabase.from('usuarios').delete().eq('id', id);
+            await registrarAuditoria('usuario', `Eliminó usuario: ${email}`);
+            await cargarDatosIniciales();
+            cargarUsuarios();
+            cargarSelects();
+            alert('Usuario eliminado');
+        } catch(e) { alert('Error: ' + e.message); }
+    }
+    
+    // Auditoría (Super Admin)
+    async function cargarAuditoria() {
+        if(currentUserRol !== 'superadmin') return;
+        const filtroUsuario = document.getElementById('auditFilterUsuario').value;
+        const filtroAccion = document.getElementById('auditFilterAccion').value;
+        let query = supabase.from('auditoria').select('*').order('fecha', { ascending: false });
+        if(filtroUsuario) query = query.eq('usuario', filtroUsuario);
+        if(filtroAccion) query = query.eq('accion', filtroAccion);
+        const { data, error } = await query;
+        if(error) { console.error(error); return; }
+        const tbody = document.getElementById('auditoriaTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="6">Sin registros</td></tr>'; return; }
+        data.forEach(reg => { const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = new Date(reg.fecha).toLocaleString();
+            row.insertCell(1).innerHTML = reg.usuario;
+            row.insertCell(2).innerHTML = `<span class="badge ${reg.rol === 'superadmin' ? 'badge-superadmin' : (reg.rol === 'admin_entidad' ? 'badge-admin' : 'badge-consultor')}">${getRolLabel(reg.rol)}</span>`;
+            let icono = ''; let texto = '';
+            if(reg.accion === 'busqueda_ci') { icono='🔍 '; texto='Búsqueda CI'; }
+            else if(reg.accion === 'busqueda_nombre') { icono='🔎 '; texto='Búsqueda Nombre'; }
+            else if(reg.accion === 'busqueda_militancia') { icono='📊 '; texto='Búsqueda Militancia'; }
+            else if(reg.accion === 'busqueda_entidad') { icono='🏢 '; texto='Búsqueda Entidad'; }
+            else if(reg.accion === 'busqueda_avanzada') { icono='🔬 '; texto='Búsqueda Avanzada'; }
+            else if(reg.accion === 'crear') { icono='➕ '; texto='Creación'; }
+            else if(reg.accion === 'editar') { icono='✏️ '; texto='Edición'; }
+            else if(reg.accion === 'eliminar') { icono='🗑️ '; texto='Eliminación'; }
+            else if(reg.accion === 'login') { icono='🔐 '; texto='Login'; }
+            else if(reg.accion === 'logout') { icono='🚪 '; texto='Logout'; }
+            else if(reg.accion === 'usuario') { icono='👥 '; texto='Usuario'; }
+            else if(reg.accion === 'entidad') { icono='🏢 '; texto='Entidad'; }
+            else { icono='📌 '; texto=reg.accion; }
+            row.insertCell(3).innerHTML = icono + texto;
+            row.insertCell(4).innerHTML = reg.detalles;
+            row.insertCell(5).innerHTML = `<button class="btn-delete" onclick="eliminarRegistroAuditoria(${reg.id})">Eliminar</button>`;
+        });
+    }
+    
+    function limpiarFiltrosAuditoria() { document.getElementById('auditFilterUsuario').value = ''; document.getElementById('auditFilterAccion').value = ''; cargarAuditoria(); }
+    async function eliminarRegistroAuditoria(id) { if(confirm('¿Eliminar este registro?')) { await supabase.from('auditoria').delete().eq('id', id); cargarAuditoria(); alert('Eliminado'); } }
+    async function eliminarTodasAuditoria() { if(confirm('⚠️ ¿Eliminar TODOS los registros?')) { await supabase.from('auditoria').delete().neq('id', 0); cargarAuditoria(); alert('Historial eliminado'); } }
+    
+    // Formularios
+    function cargarSelects() {
+        const opciones = '<option value="">Seleccione una entidad</option>' + entidades.map(e => `<option value="${e}">${e}</option>`).join('');
+        const selects = ['reg_entidad', 'edit_entidad', 'newUserEntidad', 'filterEntidad'];
+        selects.forEach(id => { const s = document.getElementById(id); if(s) { const val = s.value; s.innerHTML = opciones; if(val && entidades.includes(val)) s.value = val; } });
+        const auditFilter = document.getElementById('auditFilterUsuario');
+        if(auditFilter && usuarios.length) auditFilter.innerHTML = '<option value="">Todos</option>' + [...new Set(usuarios.map(u => u.email))].map(u => `<option value="${u}">${u}</option>`).join('');
+    }
+    
+    function toggleEntidadField() { const f = document.getElementById('entidadField'); if(f) f.style.display = document.getElementById('newUserRole')?.value === 'admin_entidad' ? 'block' : 'none'; }
     
     function abrirEditarTrabajador(id) {
         const t = trabajadores.find(t => t.id === id);
-        if (!t) return;
-        
+        if(!t) return;
         document.getElementById('edit_id').value = t.id;
         document.getElementById('edit_ci').value = t.ci;
         document.getElementById('edit_nombre').value = t.nombre;
@@ -1072,13 +666,8 @@
         document.getElementById('edit_militancia').value = t.militancia;
         document.getElementById('edit_licencia').value = t.licencia || '';
         document.getElementById('edit_vehiculo').value = t.vehiculo || '';
-        
-        if (currentUserRol === 'admin_entidad') {
-            document.getElementById('edit_entidad').disabled = true;
-        } else {
-            document.getElementById('edit_entidad').disabled = false;
-        }
-        
+        if(currentUserRol === 'admin_entidad') document.getElementById('edit_entidad').disabled = true;
+        else document.getElementById('edit_entidad').disabled = false;
         document.getElementById('editModal').style.display = 'flex';
     }
     
@@ -1089,26 +678,11 @@
     function abrirModalCrearEntidad() { document.getElementById('crearEntidadForm').reset(); document.getElementById('crearEntidadModal').style.display = 'flex'; }
     function cerrarModalEntidad() { document.getElementById('crearEntidadModal').style.display = 'none'; }
     
-    // ==================== EVENT LISTENERS ====================
+    // Eventos
     document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const nuevo = {
-            id: crypto.randomUUID(),
-            ci: document.getElementById('reg_ci').value.trim(),
-            nombre: document.getElementById('reg_nombre').value.trim(),
-            fecha_nacimiento: document.getElementById('reg_fecha_nacimiento').value,
-            sexo: document.getElementById('reg_sexo').value,
-            telefono: document.getElementById('reg_telefono').value.trim(),
-            direccion: document.getElementById('reg_direccion').value,
-            municipio: document.getElementById('reg_municipio').value,
-            entidad: document.getElementById('reg_entidad').value,
-            cargo: document.getElementById('reg_cargo').value.trim(),
-            nivel_escolar: document.getElementById('reg_nivel_escolar').value,
-            militancia: document.getElementById('reg_militancia').value,
-            licencia: document.getElementById('reg_licencia').value,
-            vehiculo: document.getElementById('reg_vehiculo').value
-        };
-        if (!nuevo.entidad) { alert('Debe seleccionar una entidad'); return; }
+        const nuevo = { id: crypto.randomUUID(), ci: document.getElementById('reg_ci').value.trim(), nombre: document.getElementById('reg_nombre').value.trim(), fecha_nacimiento: document.getElementById('reg_fecha_nacimiento').value, sexo: document.getElementById('reg_sexo').value, telefono: document.getElementById('reg_telefono').value.trim(), direccion: document.getElementById('reg_direccion').value, municipio: document.getElementById('reg_municipio').value, entidad: document.getElementById('reg_entidad').value, cargo: document.getElementById('reg_cargo').value.trim(), nivel_escolar: document.getElementById('reg_nivel_escolar').value, militancia: document.getElementById('reg_militancia').value, licencia: document.getElementById('reg_licencia').value, vehiculo: document.getElementById('reg_vehiculo').value };
+        if(!nuevo.entidad) { alert('Seleccione una entidad'); return; }
         await registrarTrabajador(nuevo);
         showSection('workersList');
     });
@@ -1116,21 +690,8 @@
     document.getElementById('editForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = document.getElementById('edit_id').value;
-        const datos = {
-            nombre: document.getElementById('edit_nombre').value,
-            fecha_nacimiento: document.getElementById('edit_fecha_nacimiento').value,
-            sexo: document.getElementById('edit_sexo').value,
-            telefono: document.getElementById('edit_telefono').value,
-            direccion: document.getElementById('edit_direccion').value,
-            municipio: document.getElementById('edit_municipio').value,
-            entidad: document.getElementById('edit_entidad').value,
-            cargo: document.getElementById('edit_cargo').value,
-            nivel_escolar: document.getElementById('edit_nivel_escolar').value,
-            militancia: document.getElementById('edit_militancia').value,
-            licencia: document.getElementById('edit_licencia').value,
-            vehiculo: document.getElementById('edit_vehiculo').value
-        };
-        if (!datos.entidad) { alert('Debe seleccionar una entidad'); return; }
+        const datos = { nombre: document.getElementById('edit_nombre').value, fecha_nacimiento: document.getElementById('edit_fecha_nacimiento').value, sexo: document.getElementById('edit_sexo').value, telefono: document.getElementById('edit_telefono').value, direccion: document.getElementById('edit_direccion').value, municipio: document.getElementById('edit_municipio').value, entidad: document.getElementById('edit_entidad').value, cargo: document.getElementById('edit_cargo').value, nivel_escolar: document.getElementById('edit_nivel_escolar').value, militancia: document.getElementById('edit_militancia').value, licencia: document.getElementById('edit_licencia').value, vehiculo: document.getElementById('edit_vehiculo').value };
+        if(!datos.entidad) { alert('Seleccione una entidad'); return; }
         await editarTrabajador(id, datos);
         cerrarModal();
     });
@@ -1140,34 +701,24 @@
         const email = document.getElementById('newUsername').value.trim();
         const password = document.getElementById('newPassword').value;
         const rol = document.getElementById('newUserRole').value;
-        let entidadAsignada = null;
-        
-        if (!email || !password) { alert('Complete todos los campos'); return; }
-        if (rol === 'admin_entidad') {
-            entidadAsignada = document.getElementById('newUserEntidad').value;
-            if (!entidadAsignada) { alert('Debe seleccionar una entidad para el administrador'); return; }
-        }
-        
-        await crearUsuario(email, password, rol, entidadAsignada);
+        let entidad = null;
+        if(rol === 'admin_entidad') { entidad = document.getElementById('newUserEntidad').value; if(!entidad) { alert('Seleccione una entidad'); return; } }
+        if(!email || !password) { alert('Complete todos los campos'); return; }
+        await crearUsuario(email, password, rol, entidad);
         cerrarModalUsuario();
     });
     
     document.getElementById('crearEntidadForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const nombre = document.getElementById('newEntidadNombre').value.trim();
-        if (!nombre) { alert('Ingrese el nombre de la entidad'); return; }
+        if(!nombre) { alert('Ingrese un nombre'); return; }
         await agregarEntidad(nombre);
         cerrarModalEntidad();
     });
     
-    window.onclick = function(event) {
-        if (event.target === document.getElementById('editModal')) cerrarModal();
-        if (event.target === document.getElementById('crearUsuarioModal')) cerrarModalUsuario();
-        if (event.target === document.getElementById('crearEntidadModal')) cerrarModalEntidad();
-    }
+    window.onclick = function(e) { if(e.target === document.getElementById('editModal')) cerrarModal(); if(e.target === document.getElementById('crearUsuarioModal')) cerrarModalUsuario(); if(e.target === document.getElementById('crearEntidadModal')) cerrarModalEntidad(); };
     
-    // Inicializar
-    cargarEntidades();
+    cargarSelects();
 </script>
 </body>
-                            </html>
+    </html>
