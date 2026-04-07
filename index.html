@@ -1,25 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test de botón</title>
+    <title>Test - Carga de Supabase</title>
+    <!-- Intentar cargar Supabase desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body style="font-family: Arial; text-align: center; padding: 50px;">
-    <h1>Prueba de botón</h1>
-    <p>Si el botón funciona, debe aparecer un mensaje</p>
+<body style="font-family: Arial; padding: 30px;">
+    <h1>🔧 Test de carga de Supabase</h1>
     
-    <button onclick="mostrarMensaje()" style="padding: 15px 40px; background: blue; color: white; border: none; border-radius: 10px; font-size: 18px;">
-        HAZ CLIC AQUÍ
+    <button onclick="verificarCarga()" style="padding: 10px 20px; background: blue; color: white; border: none; border-radius: 5px;">
+        Verificar si Supabase está cargado
     </button>
     
-    <p id="resultado" style="margin-top: 30px; font-size: 18px;"></p>
-
+    <button onclick="testConexion()" style="padding: 10px 20px; background: green; color: white; border: none; border-radius: 5px; margin-left: 10px;">
+        Probar conexión con Supabase
+    </button>
+    
+    <div id="resultado" style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 10px;"></div>
+    
     <script>
-        function mostrarMensaje() {
-            document.getElementById('resultado').innerHTML = '✅ ¡EL BOTÓN FUNCIONA CORRECTAMENTE!';
-            alert('El botón funciona');
+        function verificarCarga() {
+            const resultado = document.getElementById('resultado');
+            
+            if (typeof supabase === 'undefined') {
+                resultado.innerHTML = '❌ Supabase NO se cargó correctamente. El objeto "supabase" no existe.';
+                resultado.style.color = 'red';
+            } else {
+                resultado.innerHTML = '✅ Supabase SÍ se cargó correctamente. El objeto existe.';
+                resultado.style.color = 'green';
+            }
         }
         
-        console.log('Página cargada correctamente');
+        function testConexion() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '⏳ Probando conexión...';
+            resultado.style.color = 'blue';
+            
+            try {
+                // Configuración de Supabase
+                const SUPABASE_URL = "https://jnmhbsvjnsvagcdfujok.supabase.co";
+                const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubWhic3ZqbnN2YWdjZGZ1am9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzQ5NjUsImV4cCI6MjA5MTE1MDk2NX0.n6cSbVkX0u23zshq49O0FPCwLKS3MP-o8J8EyroI75E";
+                
+                // Intentar crear el cliente
+                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                if (client && typeof client.auth !== 'undefined') {
+                    resultado.innerHTML = '✅ Cliente de Supabase creado correctamente. La conexión está configurada.';
+                    resultado.style.color = 'green';
+                } else {
+                    resultado.innerHTML = '❌ No se pudo crear el cliente de Supabase.';
+                    resultado.style.color = 'red';
+                }
+            } catch (error) {
+                resultado.innerHTML = '❌ ERROR: ' + error.message;
+                resultado.style.color = 'red';
+            }
+        }
     </script>
 </body>
 </html>
