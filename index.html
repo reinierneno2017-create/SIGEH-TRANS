@@ -1,93 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Login SIGEH-TRANS</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Test Ultra Simple</title>
 </head>
-<body style="font-family: Arial; padding: 30px; max-width: 500px; margin: 0 auto;">
-    <h1>🚛 SIGEH-TRANS - Test Login</h1>
+<body style="font-family: Arial; text-align: center; padding: 50px;">
+    <h1>🚛 SIGEH-TRANS</h1>
+    <p>Test más simple posible</p>
     
-    <div style="background: #f0f0f0; padding: 20px; border-radius: 10px;">
-        <label><strong>Email:</strong></label>
-        <input type="email" id="email" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
-        
-        <label><strong>Contraseña:</strong></label>
-        <input type="password" id="password" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
-        
-        <button onclick="hacerLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-            INICIAR SESIÓN
-        </button>
-    </div>
+    <input type="text" id="email" placeholder="Email" style="padding: 10px; width: 250px;"><br><br>
+    <input type="password" id="pass" placeholder="Contraseña" style="padding: 10px; width: 250px;"><br><br>
     
-    <div id="resultado" style="margin-top: 20px; padding: 15px; border-radius: 8px; font-family: monospace; white-space: pre-wrap;"></div>
+    <button id="miBoton" style="padding: 12px 30px; background: blue; color: white; border: none; border-radius: 5px;">CLIC AQUÍ</button>
     
-    <hr>
-    <p><strong>Usuarios para probar:</strong></p>
-    <ul>
-        <li><code>sigehtrans.holguin@gmail.com</code></li>
-        <li><code>admin@transporte.holguin.cu</code></li>
-        <li><code>admin@sigehtrans.com</code></li>
-    </ul>
+    <p id="resultado" style="margin-top: 30px; font-size: 18px;"></p>
 
     <script>
-        const SUPABASE_URL = "https://jnmhbsvjnsvagcdfujok.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubWhic3ZqbnN2YWdjZGZ1am9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzQ5NjUsImV4cCI6MjA5MTE1MDk2NX0.n6cSbVkX0u23zshq49O0FPCwLKS3MP-o8J8EyroI75E";
+        // Buscar el botón por ID
+        const boton = document.getElementById('miBoton');
+        const resultado = document.getElementById('resultado');
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Agregar evento al botón
+        boton.addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            
+            resultado.innerHTML = '✅ Botón funcionó. Email: ' + email + ' - Pass: ' + (pass ? '****' : 'vacía');
+            resultado.style.color = 'green';
+        });
         
-        async function hacerLogin() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const resultado = document.getElementById('resultado');
-            
-            resultado.innerHTML = '';
-            resultado.style.backgroundColor = '#f0f0f0';
-            resultado.style.color = 'black';
-            
-            if (!email || !password) {
-                resultado.innerHTML = '❌ Complete todos los campos';
-                resultado.style.backgroundColor = '#fee';
-                resultado.style.color = 'red';
-                return;
-            }
-            
-            resultado.innerHTML = '⏳ Conectando a Supabase...\n';
-            resultado.innerHTML += `📧 Email: ${email}\n`;
-            resultado.innerHTML += `🔗 URL: ${SUPABASE_URL}\n\n`;
-            
-            const inicio = Date.now();
-            
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-                
-                const fin = Date.now();
-                resultado.innerHTML += `⏱️ Tiempo: ${fin - inicio} ms\n\n`;
-                
-                if (error) {
-                    resultado.innerHTML += `❌ ERROR:\n`;
-                    resultado.innerHTML += `Mensaje: ${error.message}\n`;
-                    resultado.innerHTML += `Código: ${error.status || 'sin código'}\n`;
-                    resultado.style.backgroundColor = '#fee';
-                    resultado.style.color = 'red';
-                } else {
-                    resultado.innerHTML += `✅ ¡LOGIN EXITOSO!\n`;
-                    resultado.innerHTML += `👤 Usuario: ${data.user.email}\n`;
-                    resultado.innerHTML += `🆔 ID: ${data.user.id}\n`;
-                    resultado.innerHTML += `📅 Último login: ${data.user.last_sign_in_at || 'N/A'}\n`;
-                    resultado.style.backgroundColor = '#efe';
-                    resultado.style.color = 'green';
-                }
-                
-            } catch (error) {
-                resultado.innerHTML += `❌ EXCEPCIÓN:\n`;
-                resultado.innerHTML += `${error.message}\n`;
-                resultado.style.backgroundColor = '#fee';
-                resultado.style.color = 'red';
-            }
-        }
+        // Mensaje de carga
+        resultado.innerHTML = '✅ Página cargada. Haz clic en el botón.';
+        resultado.style.color = 'blue';
     </script>
 </body>
 </html>
